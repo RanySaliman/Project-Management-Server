@@ -1,4 +1,4 @@
-package entities;
+package ProjectManagement.entities;
 
 public class Notifications {
     /*
