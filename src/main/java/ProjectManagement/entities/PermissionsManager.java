@@ -1,8 +1,6 @@
 package ProjectManagement.entities;
-
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.entities.enums.UserRole;
-
 import java.util.Map;
 import java.util.Set;
 
