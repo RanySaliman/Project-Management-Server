@@ -19,7 +19,7 @@ public class PermissionsManager {
      * @param userAction : represent the function the user wants to perform
      * @return true-if user authorised to do the action, otherwise-false
      */
-    public boolean hasPermission(UserRole userRole, UserActions userAction)
+    public static boolean hasPermission(UserRole userRole, UserActions userAction)
     {
         return permissions.get(userRole).contains(userAction);
     }
