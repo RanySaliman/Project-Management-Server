@@ -1,5 +1,7 @@
 package ProjectManagement.services;
-import ProjectManagement.entities.PermissionsManager;
+import ProjectManagement.entities.enums.UserRole;
+import ProjectManagement.repositories.BoardUserRepository;
+import ProjectManagement.utils.PermissionsManager;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.UserActions;
@@ -11,6 +13,7 @@ import java.util.Optional;
 @Service
 public class PermissionService {
     UserRepository userRepository;
+    BoardUserRepository boardUserRepository;
 
     @Autowired
     public PermissionService(UserRepository userRepository) {
@@ -23,13 +26,13 @@ public class PermissionService {
      * @param action - UserActions Enum, the action we need to check if the user can perform.
      * @return Response<Boolean> object, contains failure response - if user wasn't found. returns response with false if user doesn't have permission to perform action, and response with true if user has the permission.
      */
-    public Response<Boolean> checkPermission(int userId, UserActions action) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()) {
-            return Response.createFailureResponse(String.format("User with id: %d does not exist", userId));
+    public Response<Boolean> checkPermission(int userId, int boardId, UserActions action) {
+        Optional<UserRole> optionalUserRole = boardUserRepository.findByUserIdAndBoardId(userId, boardId);
+        if (!optionalUserRole.isPresent()) {
+            return Response.createFailureResponse(String.format("User with id: %d does not exist or board doesn't exists", userId));
         }
-        User user = optionalUser.get();
-        if( PermissionsManager.hasPermission(user.getRole(),action)) {
+        UserRole userRole = optionalUserRole.get();
+        if( PermissionsManager.hasPermission(userRole,action)) {
             return Response.createSuccessfulResponse(true);
 
         }

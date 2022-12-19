@@ -1,4 +1,4 @@
 package ProjectManagement.controllers.entities;
 
-public class UserToReg {
+public class UserToRegister {
 }

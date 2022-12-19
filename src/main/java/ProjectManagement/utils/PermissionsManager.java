@@ -1,4 +1,4 @@
-package ProjectManagement.entities;
+package ProjectManagement.utils;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.entities.enums.UserRole;
 import java.util.Map;
