@@ -1,6 +1,6 @@
 package ProjectManagement.entities;
 
-import ProjectManagement.utils.UserRole;
+import ProjectManagement.entities.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
