@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface BoardUserRepository extends JpaRepository<BoardToUser, CompositeKeyBoardUser> {
-    Optional<UserRole> findByUserIdAndBoardId( int userId, int boardId);
+    Optional<BoardToUser> findByUserIdAndBoardId( int userId, int boardId);
     long deleteByBoardId( int boardId);
 
 }
