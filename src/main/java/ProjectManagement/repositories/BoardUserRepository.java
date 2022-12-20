@@ -14,4 +14,5 @@ public interface BoardUserRepository extends JpaRepository<BoardToUser, Composit
     Optional<BoardToUser> findByUserIdAndBoardId( int userId, int boardId);
     long deleteByBoardId( int boardId);
 
+    // i love itamar
 }
