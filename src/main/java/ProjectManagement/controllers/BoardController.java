@@ -50,8 +50,8 @@ public class BoardController {
         return ResponseEntity.ok("Board created successfully");
     }
 
-    @PostMapping(value = "deleteBoard")
-    public ResponseEntity<String> deleteBoard(@RequestAttribute int userId, int boardId) {
+    @PostMapping(value = "deleteBoard/{boardId}")
+    public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
         Response<Boolean> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
             if (checkPermission.getData()) {

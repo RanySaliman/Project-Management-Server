@@ -12,13 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 @Service
 public class PermissionService {
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     BoardUserRepository boardUserRepository;
 
-    @Autowired
-    public PermissionService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+
 
     /**
      * Checks if a given user (represented by user id) has permission to perform the given action in the system.
