@@ -7,6 +7,7 @@ import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.UserSource;
 import ProjectManagement.repositories.UserRepository;
 import ProjectManagement.utils.EmailSender;
+import ProjectManagement.utils.PasswordEncryption;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,7 @@ public class UserService {
     }
 
     public Response<User> localRegister(String email, String username, String password) {
-        User localUser = new User(email, username, password, UserSource.LOCAL);
+        User localUser = new User(email, username, PasswordEncryption.encryptPassword(password), UserSource.LOCAL);
         Response<User> registerUser = registerUser(localUser);
         if (registerUser.isSucceed()) {
             emailSender.sendEmail(List.of(localUser.getEmail()), "Welcome to Project Management", "Please click on the following link to activate your account: ");

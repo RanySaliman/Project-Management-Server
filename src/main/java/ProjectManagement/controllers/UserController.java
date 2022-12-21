@@ -25,11 +25,16 @@ public class UserController {
     }
     @PostMapping("/register")
     public ResponseEntity<String> localRegister(@RequestBody UserToRegister userToRegister) {
-        Response<User> isUserCreated = userService.localRegister(userToRegister.getEmail(), userToRegister.getUserName(), userToRegister.getPassword());
-        if(isUserCreated.isSucceed()) {
-            return ResponseEntity.ok("user created successfully.");
+        Response<Void> isValidUser = Validation.isValidUserProperties(userToRegister.getUserName(), userToRegister.getPassword(), userToRegister.getEmail());
+        if(isValidUser.isSucceed()) {
+            Response<User> isUserCreated = userService.localRegister(userToRegister.getEmail(), userToRegister.getUserName(), userToRegister.getPassword());
+            if (isUserCreated.isSucceed()) {
+                return ResponseEntity.ok("user created successfully.");
+            } else {
+                return ResponseEntity.badRequest().body(isUserCreated.getMessage());
+            }
         } else {
-            return ResponseEntity.badRequest().body(isUserCreated.getMessage());
+            return ResponseEntity.badRequest().body("invalid user properties\n"+isValidUser.getMessage());
         }
     }
 }
