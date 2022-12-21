@@ -1,39 +1,41 @@
 package ProjectManagement.services;
 
+import ProjectManagement.controllers.entities.FilterFields;
 import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
-    /*
-    private int boardId;
-    @Id
-    private int id;
-    private int taskParentId;
-    private int creator = dani;
-    private int assignedUserId ;
-    LocalDateTime DueDate;
-    int importance; // 1-5 where 5 is the highest priority
-    String title;
-    String description;*/
+    private FilterFields fields;
+    private FilterFields filterFields;
 
-    public List<Task> filter(int boardId, Optional<Integer> id, Optional<Integer> taskParentId, Optional<Integer> creator, Optional<Integer> assignedUserId
-                     , Optional<LocalDateTime> dueDate, Optional<Integer> importance, Optional<String> title, Optional<String> description){
-        if(id.isPresent()){
+
+    public List<Task> filter(int boardId, FilterFields filterFields){
+        Integer creator = filterFields.getCreator();
+        String title = filterFields.getTitle();
+        LocalDateTime dueDate = filterFields.getDueDate();
+
+        if(creator != null){
             return taskRepository.findAll().stream()
-                    .filter(task -> task.getBoardId() == id.get()).collect(Collectors.toList());
+                    .filter(task -> task.getBoardId() == creator).collect(Collectors.toList());
         }
-        if(taskParentId.isPresent()){
+        if(title != null){
             return taskRepository.findAll().stream()
-                    .filter(task -> task.getBoardId() == taskParentId.get()).collect(Collectors.toList());
+                    .filter(task -> task.getTitle() == title).collect(Collectors.toList());
         }
 
+        if(dueDate != null){
+            return taskRepository.findAll().stream()
+                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toList());
+        }
+
+        return null;
     }
 }

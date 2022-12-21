@@ -1,6 +1,7 @@
 package ProjectManagement.controllers;
 
 import ProjectManagement.controllers.entities.BoardFields;
+import ProjectManagement.controllers.entities.FilterFields;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
@@ -44,9 +45,7 @@ public class BoardController {
         }else {
             return ResponseEntity.badRequest().body(null);
         }
-
     }
-
 
     @PostMapping(value = "createBoard")
     public ResponseEntity<String> createBoard(@RequestBody BoardFields fields) {
@@ -54,8 +53,8 @@ public class BoardController {
         return ResponseEntity.ok("Board created successfully");
     }
 
-    @PostMapping(value = "deleteBoard")
-    public ResponseEntity<String> deleteBoard(@RequestAttribute int userId, int boardId) {
+    @PostMapping(value = "deleteBoard/{boardId}")
+    public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
         Response<Boolean> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
             if (checkPermission.getData()) {
@@ -66,9 +65,8 @@ public class BoardController {
 
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public List<Task> filter(@RequestBody int boardId, List<Optional> filterValue) {
-        return taskService.filter(boardId,filterValue);
+    public List<Task> filter(@RequestBody int boardId, FilterFields filterFields) {
+        return taskService.filter(boardId, filterFields);
     }
-
 
 }

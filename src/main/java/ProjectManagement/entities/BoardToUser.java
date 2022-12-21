@@ -4,10 +4,7 @@ import ProjectManagement.entities.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "BoardToUser")
@@ -19,6 +16,7 @@ public class BoardToUser {
     int boardId;
     @Id
     int userId;
+    @Column
     private UserRole userRole;
     public BoardToUser(UserRole userRole)
     {

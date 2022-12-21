@@ -1,4 +1,5 @@
 package ProjectManagement.services;
+import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardUserRepository;
 import ProjectManagement.utils.PermissionsManager;
@@ -12,13 +13,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 @Service
 public class PermissionService {
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     BoardUserRepository boardUserRepository;
 
-    @Autowired
-    public PermissionService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+
 
     /**
      * Checks if a given user (represented by user id) has permission to perform the given action in the system.
@@ -27,11 +27,11 @@ public class PermissionService {
      * @return Response<Boolean> object, contains failure response - if user wasn't found. returns response with false if user doesn't have permission to perform action, and response with true if user has the permission.
      */
     public Response<Boolean> checkPermission(int userId, int boardId, UserActions action) {
-        Optional<UserRole> optionalUserRole = boardUserRepository.findByUserIdAndBoardId(userId, boardId);
+        Optional<BoardToUser> optionalUserRole = boardUserRepository.findByUserIdAndBoardId(userId, boardId);
         if (!optionalUserRole.isPresent()) {
             return Response.createFailureResponse(String.format("User with id: %d does not exist or board doesn't exists", userId));
         }
-        UserRole userRole = optionalUserRole.get();
+        UserRole userRole = optionalUserRole.get().getUserRole();
         if( PermissionsManager.hasPermission(userRole,action)) {
             return Response.createSuccessfulResponse(true);
 
