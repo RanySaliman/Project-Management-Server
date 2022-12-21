@@ -1,11 +1,10 @@
 package ProjectManagement.entities;
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 @Getter
 @Setter
@@ -31,14 +30,23 @@ public class Task {
      */
     private int boardId;
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private int taskParentId;
     private int creator;
     private int assignedUserId;
-    LocalDateTime DueDate;
+    LocalDateTime dueDate;
     int importance; // 1-5 where 5 is the highest priority
     String title;
     String description;
 
-
+    public Task(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description) {
+        this.boardId = boardId;
+        this.taskParentId = taskParentId;
+        this.assignedUserId = assignedUserId;
+        this.dueDate = LocalDateTime.now();
+        this.importance = importance;
+        this.title = title;
+        this.description = description;
+    }
 }
