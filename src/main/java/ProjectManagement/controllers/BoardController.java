@@ -3,10 +3,12 @@ package ProjectManagement.controllers;
 import ProjectManagement.controllers.entities.BoardFields;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
+import ProjectManagement.entities.Task;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.AuthService;
 import ProjectManagement.services.BoardService;
 import ProjectManagement.services.PermissionService;
+import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ public class BoardController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private BoardService boardService;
@@ -60,6 +64,11 @@ public class BoardController {
         }else return ResponseEntity.badRequest().body("wrong id");
     }
 
+
+    @RequestMapping(value = "/filter", method = RequestMethod.GET)
+    public List<Task> filter(@RequestBody int boardId, List<Optional> filterValue) {
+        return taskService.filter(boardId,filterValue);
+    }
 
 
 }
