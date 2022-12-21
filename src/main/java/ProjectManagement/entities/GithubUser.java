@@ -13,7 +13,5 @@ public class GithubUser {
     private String siteUsername;
     private String source="github";
     private String accessToken;
-    public String getLogin(){
-        return siteUsername;
-    }
 }
+

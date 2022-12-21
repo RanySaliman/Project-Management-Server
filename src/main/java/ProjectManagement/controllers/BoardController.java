@@ -1,7 +1,10 @@
 package ProjectManagement.controllers;
 
+<<<<<<< HEAD
 import ProjectManagement.controllers.entities.BoardFields;
 import ProjectManagement.controllers.entities.FilterFields;
+=======
+>>>>>>> main
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
@@ -13,10 +16,6 @@ import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -33,9 +32,9 @@ public class BoardController {
     @Autowired
     private PermissionService permissionService;
     /**
-     * end point that responsible for fetching private chats
-     * @param id
-     * @return private chats
+     * end point that responsible for fetching board
+     * @header id
+     * @return board
      */
     @RequestMapping(value = "getBoard", method = RequestMethod.GET)
     public ResponseEntity<Board> getBoard(@RequestHeader int id) {
@@ -48,8 +47,8 @@ public class BoardController {
     }
 
     @PostMapping(value = "createBoard")
-    public ResponseEntity<String> createBoard(@RequestBody BoardFields fields) {
-        boardService.createBoard(fields.name);
+    public ResponseEntity<String> createBoard(@RequestBody Board fields) {
+        boardService.createBoard(fields.getName());
         return ResponseEntity.ok("Board created successfully");
     }
 

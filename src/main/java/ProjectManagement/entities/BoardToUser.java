@@ -17,6 +17,10 @@ public class BoardToUser {
     @Id
     int userId;
     @Column
+<<<<<<< HEAD
+=======
+    @Enumerated(EnumType.STRING)
+>>>>>>> main
     private UserRole userRole;
     public BoardToUser(UserRole userRole)
     {
