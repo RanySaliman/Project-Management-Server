@@ -3,9 +3,9 @@ package ProjectManagement.controllers;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.enums.UserActions;
-import ProjectManagement.services.AuthService;
+
 import ProjectManagement.services.BoardService;
-import ProjectManagement.services.PermissionService;
+//import ProjectManagement.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/board")
 public class BoardController {
 
-    @Autowired
-    private AuthService authService;
+
 
     @Autowired
     private BoardService boardService;
-    @Autowired
-    private PermissionService permissionService;
+   // @Autowired
+    //private PermissionService permissionService;
     /**
      * end point that responsible for fetching board
      * @header id
@@ -40,11 +39,11 @@ public class BoardController {
 
 
     @PostMapping(value = "createBoard")
-    public ResponseEntity<String> createBoard(@RequestBody Board fields) {
-        boardService.createBoard(fields.getName());
+    public ResponseEntity<String> createBoard(@RequestBody Board board) {
+        boardService.createBoard(board.getName());
         return ResponseEntity.ok("Board created successfully");
     }
-
+/*
     @PostMapping(value = "deleteBoard/{boardId}")
     public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
         Response<Boolean> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
@@ -54,7 +53,7 @@ public class BoardController {
             }else return ResponseEntity.badRequest().body("not permitted to delete board");
         }else return ResponseEntity.badRequest().body("wrong id");
     }
-
+*/
 
 
 }
