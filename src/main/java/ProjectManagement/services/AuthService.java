@@ -1,14 +1,11 @@
 package ProjectManagement.services;
 
-/*
+
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.User;
 import ProjectManagement.repositories.UserRepository;
 import ProjectManagement.utils.PasswordEncryption;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,15 @@ public class AuthService {
             return Response.createFailureResponse("Invalid email or password");
         }
     }
+    public  Response<String> reLogin(String token) {
+        Response<Integer> isValidToken = validateToken(token);
+        if (isValidToken.isSucceed()) {
+            User user = userRepository.findById(isValidToken.getData()).get();
+            return Response.createSuccessfulResponse(generateNewToken(user));
+        } else {
+            return Response.createFailureResponse("Invalid token");
+        }
+    }
 
     private String generateNewToken(User user) {
         long HourQuarterAsMillis = 900000;
@@ -52,10 +58,11 @@ public class AuthService {
                 .signWith(key, SignatureAlgorithm.HS256).compact();
     }
 
-    public Response<Void> validateToken(String jwt) {
+    public Response<Integer> validateToken(String jwt) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
-            return Response.createSuccessfulResponse(null);
+            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
+            Integer userid  = claimsJws.getBody().get("userId", Integer.class);
+            return Response.createSuccessfulResponse(userid);
         } catch (SignatureException e) {
             return Response.createFailureResponse("Invalid token signature");
         } catch (ExpiredJwtException e) {
@@ -66,4 +73,4 @@ public class AuthService {
             return Response.createFailureResponse("Invalid token");
         }
     }
-}*/
+}
