@@ -2,15 +2,11 @@ package ProjectManagement.services;
 
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
-import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
-import ProjectManagement.repositories.BoardUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,8 +14,7 @@ import java.util.Optional;
 public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
-    @Autowired
-    private BoardUserRepository boardUserRepository;
+
 
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
@@ -40,11 +35,11 @@ public class BoardService {
     }
 
     public Board createBoard(String boardName){
-        return boardRepository.save(new Board(boardName));
+        Board board = new Board(boardName);
+        return boardRepository.save(board) ;
     }
 
     public Response<String> deleteBoard(int boardId){
-        boardUserRepository.deleteByBoardId(boardId);
         boardRepository.deleteById(boardId);
         return Response.createSuccessfulResponse("Board successfully deleted");
     }

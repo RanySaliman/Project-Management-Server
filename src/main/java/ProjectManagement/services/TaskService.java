@@ -2,8 +2,9 @@ package ProjectManagement.services;
 
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
+import ProjectManagement.entities.Status;
 import ProjectManagement.entities.Task;
-import ProjectManagement.repositories.TaskRepository;
+import ProjectManagement.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class TaskService {
     @Autowired
-    private TaskRepository taskRepository;
+    BoardRepository boardRepository;
     /*
     private int boardId;
     @Id
@@ -28,14 +29,26 @@ public class TaskService {
     String description;*/
 
     public List<Task> filter(int boardId, Optional<Integer> importance){
-
-        return taskRepository.findAll().stream()
-        .filter(task -> task.getBoardId() == boardId).
-                collect(Collectors.toList());
+        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+        if(optionalBoard.isPresent()) {
+            Board board = optionalBoard.get();
+            return board.getTaskStatusMap().keySet().stream().filter(task -> {
+                if (importance.isPresent()) {
+                    return task.getImportance() == importance.get();
+                } else {
+                    return true;
+                }
+            }).collect(Collectors.toList());
+        }
+        return null;
     }
 
     public Response<Task> addTask(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description){
-        return Response.createSuccessfulResponse(taskRepository.save(new Task(boardId, taskParentId, assignedUserId, importance, title, description)));
+        Task task = new Task(boardId, taskParentId, assignedUserId, importance, title, description);
+        Board board = boardRepository.findById(boardId).get();
+        board.getTaskStatusMap().put(task,new Status());
+        boardRepository.save(board);
+        return Response.createSuccessfulResponse(board.getTaskStatusMap().keySet().stream().filter(t -> t.getId() == task.getId()).findFirst().get());
     }
 
         /*

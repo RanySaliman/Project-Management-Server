@@ -1,4 +1,4 @@
-package ProjectManagement.services;
+package ProjectManagement.services;/*
 import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardUserRepository;
@@ -25,7 +25,7 @@ public class PermissionService {
      * @param userId - int, id of user that we want to check if he has a permission to perform the given action.
      * @param action - UserActions Enum, the action we need to check if the user can perform.
      * @return Response<Boolean> object, contains failure response - if user wasn't found. returns response with false if user doesn't have permission to perform action, and response with true if user has the permission.
-     */
+
     public Response<Boolean> checkPermission(int userId, int boardId, UserActions action) {
         Optional<BoardToUser> optionalUserRole = boardUserRepository.findByUserIdAndBoardId(userId, boardId);
         if (!optionalUserRole.isPresent()) {
@@ -38,4 +38,4 @@ public class PermissionService {
         }
         return Response.createSuccessfulResponse(false);
     }
-}
+}*/
