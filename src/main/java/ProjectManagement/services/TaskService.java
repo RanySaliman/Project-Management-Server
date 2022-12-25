@@ -9,6 +9,7 @@ import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +31,7 @@ public class TaskService {
         Integer importance =filterFields.getImportance();
         String description= filterFields.getDescription();
         Integer taskParentId= filterFields.getTaskParentId();
-        List<Task>  filteredTak =taskRepository.findAll().stream().collect(Collectors.toList());
+        List<Task>  filteredTak =taskRepository.findAll();
         if(creator > 0){
             filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toList());
         }

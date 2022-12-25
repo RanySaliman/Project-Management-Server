@@ -15,8 +15,8 @@ public class AuthFilter implements Filter {
 
     private final AuthService authService;
     private final Pattern bearerPattern = Pattern.compile("^[Bb]earer\\s+(.*)$");
-    private final Set<Pattern> publicUrls = Set.of(Pattern.compile("^/board/.*$"), Pattern.compile("^/task/.*$"));
-
+    //private final Set<Pattern> publicUrls = Set.of(Pattern.compile("^/board/.*$"), Pattern.compile("^/task/.*$"));
+    private final Set<Pattern> publicUrls = Set.of();
     public AuthFilter(AuthService authService) {
         this.authService = authService;
     }

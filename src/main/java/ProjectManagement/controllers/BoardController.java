@@ -7,9 +7,11 @@ import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 
 import ProjectManagement.entities.Task;
+import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.AuthService;
 import ProjectManagement.services.BoardService;
 
+import ProjectManagement.services.PermissionService;
 import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +33,8 @@ public class BoardController {
 
     @Autowired
     private BoardService boardService;
-   // @Autowired
-    //private PermissionService permissionService;
+    @Autowired
+    private PermissionService permissionService;
     /**
      * end point that responsible for fetching board
      * @header id
@@ -53,17 +55,16 @@ public class BoardController {
         boardService.createBoard(boardName);
         return ResponseEntity.ok("Board created successfully");
     }
-/*
+
     @PostMapping(value = "deleteBoard/{boardId}")
     public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
-        Response<Boolean> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
+        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId,UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
-            if (checkPermission.getData()) {
-                return ResponseEntity.ok(boardService.deleteBoard(boardId).getData());
-            }else return ResponseEntity.badRequest().body("not permitted to delete board");
-        }else return ResponseEntity.badRequest().body("wrong id");
+            return ResponseEntity.ok(boardService.deleteBoard(boardId).getData());
+        }
+        else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
-*/
+
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
     public List<Task> filter(@RequestBody TaskFields filterFields) {
