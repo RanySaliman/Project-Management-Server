@@ -1,16 +1,15 @@
 package ProjectManagement.controllers;
 
 
-import ProjectManagement.controllers.entities.FilterFields;
+import ProjectManagement.controllers.entities.TaskFields;
 
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 
 import ProjectManagement.entities.Task;
-import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.AuthService;
 import ProjectManagement.services.BoardService;
-import ProjectManagement.services.PermissionService;
+
 import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +49,8 @@ public class BoardController {
     }
 
     @PostMapping(value = "createBoard")
-    public ResponseEntity<String> createBoard(@RequestBody Board board) {
-        boardService.createBoard(board.getName());
+    public ResponseEntity<String> createBoard(@RequestParam("name") String boardName) {
+        boardService.createBoard(boardName);
         return ResponseEntity.ok("Board created successfully");
     }
 /*
@@ -67,8 +66,8 @@ public class BoardController {
 */
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public List<Task> filter(@RequestBody FilterFields filterFields) {
-        return taskService.filter(filterFields.getBoardId(),filterFields);
+    public List<Task> filter(@RequestBody TaskFields filterFields) {
+        return taskService.filter(filterFields);
     }
 
 
