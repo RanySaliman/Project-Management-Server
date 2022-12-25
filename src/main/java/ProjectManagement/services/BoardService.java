@@ -2,7 +2,10 @@ package ProjectManagement.services;
 
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
+import ProjectManagement.entities.User;
+import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
+import ProjectManagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +37,9 @@ public class BoardService {
         }
     }
 
-    public Board createBoard(String boardName){
+    public Board createBoard(User Creator, String boardName){
         Board board = new Board(boardName);
+        board.getUsers().put(Creator, UserRole.ADMIN);
         return boardRepository.save(board) ;
     }
 

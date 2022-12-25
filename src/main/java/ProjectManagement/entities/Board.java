@@ -29,6 +29,7 @@ public class Board {
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "userId")
     @Column(name = "userRole")
+    @Enumerated(EnumType.STRING)
     Map<User, UserRole> users;
     @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL)
     Set<Task> tasks;
