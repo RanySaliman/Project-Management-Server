@@ -23,8 +23,7 @@ import java.util.List;
 public class BoardController {
 
 
-    @Autowired
-    private AuthService authService;
+
     @Autowired
     private TaskService taskService;
 
@@ -65,13 +64,13 @@ public class BoardController {
     }
 */
 
-    @RequestMapping(value = "/filter", method = RequestMethod.GET)
+    @GetMapping(value = "/filter")
     public List<Task> filter(@RequestBody TaskFields filterFields) {
         return taskService.filter(filterFields);
     }
 
 
-    @RequestMapping(value = "/getAllTasks", method = RequestMethod.GET)
+    @GetMapping(value = "/getAllTasks")
     public List<Task> getAllTasks() {
         return taskService.getAll();
     }

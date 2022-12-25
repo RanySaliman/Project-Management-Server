@@ -1,5 +1,6 @@
 package ProjectManagement.controllers.entities;
 
+import ProjectManagement.entities.Task;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,5 +21,6 @@ public class TaskFields {
     private int importance;
     private String description;
     String title;
+
 
 }
