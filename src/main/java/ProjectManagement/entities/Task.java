@@ -14,20 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Task")
 public class Task {
-    /*
-    ● Items have the following data:
-○ Board id
-○ Status (open/in progress/etc..)(per board)
-○ Type (Task/Bug/Subtask/etc..)(per board)
-○ Parent item
-○ Creator (user)
-○ Assigned to (user)
-○ Due date
-○ Importance (1-5)
-○ Title
-○ Description
-○ Comments
-     */
+
     private int boardId;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,7 +23,7 @@ public class Task {
     private int creator;
     private int assignedUserId;
     LocalDateTime dueDate;
-    int importance; // 1-5 where 5 is the highest priority
+    private Integer importance; // 1-5 where 5 is the highest priority
     String title;
     String description;
 

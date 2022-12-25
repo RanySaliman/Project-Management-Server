@@ -1,10 +1,8 @@
 package ProjectManagement.controllers;
 
-<<<<<<< HEAD
-import ProjectManagement.controllers.entities.BoardFields;
+
 import ProjectManagement.controllers.entities.FilterFields;
-=======
->>>>>>> main
+
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
@@ -16,6 +14,8 @@ import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -64,8 +64,13 @@ public class BoardController {
 
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public List<Task> filter(@RequestBody int boardId, FilterFields filterFields) {
-        return taskService.filter(boardId, filterFields);
+    public List<Task> filter(@RequestBody FilterFields filterFields) {
+        return taskService.filter(filterFields.getBoardId(),filterFields);
     }
 
+
+    @RequestMapping(value = "/getAllTasks", method = RequestMethod.GET)
+    public List<Task> getAllTasks() {
+        return taskService.getAll();
+    }
 }
