@@ -2,8 +2,9 @@ package ProjectManagement.services;
 
 import ProjectManagement.controllers.entities.FilterFields;
 import ProjectManagement.entities.Response;
+import ProjectManagement.entities.Status;
 import ProjectManagement.entities.Task;
-import ProjectManagement.repositories.TaskRepository;
+import ProjectManagement.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class TaskService {
     @Autowired
+
     private TaskRepository taskRepository;
     private FilterFields fields;
     private FilterFields filterFields;
@@ -55,7 +57,11 @@ public class TaskService {
     }
 
     public Response<Task> addTask(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description){
-        return Response.createSuccessfulResponse(taskRepository.save(new Task(boardId, taskParentId, assignedUserId, importance, title, description)));
+        Task task = new Task(boardId, taskParentId, assignedUserId, importance, title, description);
+        Board board = boardRepository.findById(boardId).get();
+        board.getTaskStatusMap().put(task,new Status());
+        boardRepository.save(board);
+        return Response.createSuccessfulResponse(board.getTaskStatusMap().keySet().stream().filter(t -> t.getId() == task.getId()).findFirst().get());
     }
 
     public List<Task> getAll() {

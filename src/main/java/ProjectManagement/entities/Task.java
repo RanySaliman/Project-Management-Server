@@ -1,7 +1,6 @@
 package ProjectManagement.entities;
 
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 import javax.persistence.*;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "Task")
+@Table(name = "task")
 public class Task {
 
     private int boardId;
