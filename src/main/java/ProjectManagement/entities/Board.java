@@ -7,6 +7,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,26 +30,20 @@ public class Board {
     @MapKeyColumn(name = "userId")
     @Column(name = "userRole")
     Map<User, UserRole> users;
-
+    @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL)
+    Set<Task> tasks;
 
     @ElementCollection
-    @CollectionTable(name = "BoardTasksType",
+    @CollectionTable(name = "BoardTaskTypes",
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "taskId")
-    @Column(name = "taskStatus")
-    Map<Task,TaskType> taskTypeMap;
+    @Column(name = "taskType")
+     Set<String> taskTypes;
 
 
     @ElementCollection
-    @CollectionTable(name = "BoardTasksStatuses",
-            joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "taskId")
-    @Column(name = "taskStatus")
-    Map<Task,Status> taskStatusMap;
-
-    @ElementCollection
-    @CollectionTable(name = "board_statuses", joinColumns = @JoinColumn(name = "board_id"))
-    Set<Status> statuses;
+    @CollectionTable(name = "board_statuses",   joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
+    @Column(name = "Status")
+    Set<String> statuses;
 
 
 
@@ -56,8 +51,9 @@ public class Board {
     public Board(String name) {
         this.name = name;
         this.users=new HashMap<>();
-        this.taskStatusMap=new HashMap<>();
-        this.taskTypeMap=new HashMap<>();
+        this.tasks=new HashSet<>();
+        this.taskTypes=new HashSet<>(Set.of("Task","Bug","Subtask"));
+        this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
     }
     public void addUser(User user, UserRole userRole) {
         users.put(user, userRole);

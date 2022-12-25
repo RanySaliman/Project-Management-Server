@@ -1,5 +1,6 @@
 package ProjectManagement.controllers;
 
+import ProjectManagement.controllers.entities.TaskFields;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
@@ -22,7 +23,7 @@ public class TaskController {
      * @return board
      */
     @RequestMapping(value = "addTask", method = RequestMethod.POST)
-    public ResponseEntity<String> addTask(@RequestBody Task fields) {
+    public ResponseEntity<String> addTask(@RequestBody TaskFields fields) {
         Response<Task> task = taskService.addTask(fields.getBoardId(),fields.getTaskParentId(), fields.getAssignedUserId(), fields.getImportance(), fields.getTitle(), fields.getDescription());
         if(task.isSucceed()){
             return ResponseEntity.ok("Task created successfully");

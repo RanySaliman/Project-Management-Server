@@ -1,26 +1,29 @@
 package ProjectManagement.services;
 
-import ProjectManagement.controllers.entities.FilterFields;
+
+import ProjectManagement.controllers.entities.TaskFields;
+import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
-import ProjectManagement.entities.Status;
 import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.BoardRepository;
+import ProjectManagement.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
     @Autowired
-
     private TaskRepository taskRepository;
-    private FilterFields fields;
-    private FilterFields filterFields;
+    @Autowired
+    private BoardRepository boardRepository;
 
-    public List<Task> filter(int boardId, FilterFields filterFields){
+    public List<Task> filter(TaskFields filterFields){
         Integer creator = filterFields.getCreator();
         String title = filterFields.getTitle();
         LocalDateTime dueDate = filterFields.getDueDate();
@@ -57,11 +60,14 @@ public class TaskService {
     }
 
     public Response<Task> addTask(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description){
-        Task task = new Task(boardId, taskParentId, assignedUserId, importance, title, description);
-        Board board = boardRepository.findById(boardId).get();
-        board.getTaskStatusMap().put(task,new Status());
-        boardRepository.save(board);
-        return Response.createSuccessfulResponse(board.getTaskStatusMap().keySet().stream().filter(t -> t.getId() == task.getId()).findFirst().get());
+        Optional<Board> boardFromDB = boardRepository.findById(boardId);
+        if(boardFromDB.isPresent()) {
+            Board board = boardFromDB.get();
+            Task task = new Task(board, taskParentId, assignedUserId, importance, title, description);
+            Task savedTask = taskRepository.save(task);
+            return Response.createSuccessfulResponse(savedTask);
+        }
+        return Response.createFailureResponse("Board not found");
     }
 
     public List<Task> getAll() {

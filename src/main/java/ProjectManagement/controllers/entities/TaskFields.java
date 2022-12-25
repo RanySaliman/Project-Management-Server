@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FilterFields {
+public class TaskFields {
     int boardId;
     private int id;
     private int taskParentId;

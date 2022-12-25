@@ -1,12 +1,16 @@
 package ProjectManagement.entities;
 
-import javax.persistence.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "Comment")
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Embeddable
+@Data
 public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
     private String content;
+    private LocalDateTime time;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User creator;
 }
