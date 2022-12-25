@@ -1,46 +1,59 @@
 package ProjectManagement.services;
 
-import ProjectManagement.entities.Board;
+import ProjectManagement.controllers.entities.FilterFields;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Status;
 import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
     @Autowired
-    BoardRepository boardRepository;
-    /*
-    private int boardId;
-    @Id
-    private int id;
-    private int taskParentId;
-    private int creator = dani;
-    private int assignedUserId ;
-    LocalDateTime DueDate;
-    int importance; // 1-5 where 5 is the highest priority
-    String title;
-    String description;*/
 
-    public List<Task> filter(int boardId, Optional<Integer> importance){
-        Optional<Board> optionalBoard = boardRepository.findById(boardId);
-        if(optionalBoard.isPresent()) {
-            Board board = optionalBoard.get();
-            return board.getTaskStatusMap().keySet().stream().filter(task -> {
-                if (importance.isPresent()) {
-                    return task.getImportance() == importance.get();
-                } else {
-                    return true;
-                }
-            }).collect(Collectors.toList());
+    private TaskRepository taskRepository;
+    private FilterFields fields;
+    private FilterFields filterFields;
+
+    public List<Task> filter(int boardId, FilterFields filterFields){
+        Integer creator = filterFields.getCreator();
+        String title = filterFields.getTitle();
+        LocalDateTime dueDate = filterFields.getDueDate();
+        Integer importance =filterFields.getImportance();
+        String description= filterFields.getDescription();
+        Integer taskParentId= filterFields.getTaskParentId();
+        List<Task>  filteredTak =taskRepository.findAll().stream().collect(Collectors.toList());
+        if(creator > 0){
+            filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toList());
         }
-        return null;
+        if(description != null){
+            filteredTak =filteredTak.stream()
+                    .filter(task -> Objects.equals(task.getDescription(), description)).collect(Collectors.toList());
+        }
+        if(title != null){
+            filteredTak =filteredTak.stream()
+                    .filter(task -> Objects.equals(task.getTitle(), title)).collect(Collectors.toList());
+        }
+
+        if(dueDate != null){
+            filteredTak = filteredTak.stream()
+                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toList());
+        }
+        if(importance > 0){
+            filteredTak = filteredTak.stream()
+                    .filter(task -> task.getImportance() == importance).collect(Collectors.toList());
+        }
+
+        if(taskParentId > 0){
+            filteredTak = filteredTak.stream()
+                    .filter(task -> task.getTaskParentId() == taskParentId).collect(Collectors.toList());
+        }
+        return filteredTak;
     }
 
     public Response<Task> addTask(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description){
@@ -51,18 +64,9 @@ public class TaskService {
         return Response.createSuccessfulResponse(board.getTaskStatusMap().keySet().stream().filter(t -> t.getId() == task.getId()).findFirst().get());
     }
 
-        /*
-            private int boardId;
-    @Id
-    private int id;
-    private int taskParentId;
-    private int creator;
-    private int assignedUserId;
-    LocalDateTime DueDate;
-    int importance; // 1-5 where 5 is the highest priority
-    String title;
-    String description;
+    public List<Task> getAll() {
+        return taskRepository.findAll();
+    }
 
 
-         */
 }

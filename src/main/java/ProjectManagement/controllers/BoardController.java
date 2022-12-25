@@ -1,20 +1,33 @@
 package ProjectManagement.controllers;
 
+
+import ProjectManagement.controllers.entities.FilterFields;
+
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 
-
+import ProjectManagement.entities.Task;
+import ProjectManagement.entities.enums.UserActions;
+import ProjectManagement.services.AuthService;
 import ProjectManagement.services.BoardService;
-//import ProjectManagement.services.PermissionService;
+import ProjectManagement.services.PermissionService;
+import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/board")
 public class BoardController {
 
+
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private TaskService taskService;
 
 
     @Autowired
@@ -34,9 +47,7 @@ public class BoardController {
         }else {
             return ResponseEntity.badRequest().body(null);
         }
-
     }
-
 
     @PostMapping(value = "createBoard")
     public ResponseEntity<String> createBoard(@RequestBody Board board) {
@@ -55,5 +66,14 @@ public class BoardController {
     }
 */
 
+    @RequestMapping(value = "/filter", method = RequestMethod.GET)
+    public List<Task> filter(@RequestBody FilterFields filterFields) {
+        return taskService.filter(filterFields.getBoardId(),filterFields);
+    }
 
+
+    @RequestMapping(value = "/getAllTasks", method = RequestMethod.GET)
+    public List<Task> getAllTasks() {
+        return taskService.getAll();
+    }
 }
