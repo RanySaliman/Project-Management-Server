@@ -4,7 +4,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-
 public class SocketsUtil {
     private final SimpMessagingTemplate template;
 
@@ -18,7 +17,7 @@ public class SocketsUtil {
      * @param message - OutputMessage object, contains: text message to be sent, sender, receiver and timestamp
      * @return OutputMessage object, the message that was sent.
      */
-    public <T> T writeMessageToMainRoom(T message,String topic) {
+    public <T> T writeMessageToPublicTopic(T message, String topic) {
         template.convertAndSend("/topic/"+topic, message);
         return message;
     }
@@ -31,7 +30,7 @@ public class SocketsUtil {
      */
     public <T> T writeMessageToPrivateChannel(T message, String receiver) {
         template.convertAndSendToUser(receiver, "/", message);
-       return  message;
+        return  message;
     }
 
 }

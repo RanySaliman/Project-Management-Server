@@ -26,6 +26,13 @@ public class AuthService {
         return generator.generateKey();
     }
 
+    public Response<String> githubLogin(User user) {
+        if (user != null && userRepository.existsById(user.getId())) {
+            return Response.createSuccessfulResponse(generateNewToken(user));
+        }
+        return Response.createFailureResponse("User not found");
+    }
+
     public Response<String> login(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user != null && PasswordEncryption.isPasswordCorrect(user.getPassword(), password)) {
@@ -34,7 +41,8 @@ public class AuthService {
             return Response.createFailureResponse("Invalid email or password");
         }
     }
-    public  Response<String> reLogin(String token) {
+
+    public Response<String> reLogin(String token) {
         Response<Integer> isValidToken = validateToken(token);
         if (isValidToken.isSucceed()) {
             User user = userRepository.findById(isValidToken.getData()).get();
@@ -51,7 +59,7 @@ public class AuthService {
                 .setIssuer("IRD")
                 .setIssuedAt(new java.util.Date())
                 .setSubject("Authentication")
-                .setExpiration(new java.util.Date(System.currentTimeMillis() +  HourQuarterAsMillis))
+                .setExpiration(new java.util.Date(System.currentTimeMillis() + HourQuarterAsMillis))
                 .claim("userId", user.getId())
                 .claim("email", user.getEmail())
                 .claim("source", user.getSource().name())
@@ -61,7 +69,7 @@ public class AuthService {
     public Response<Integer> validateToken(String jwt) {
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
-            Integer userid  = claimsJws.getBody().get("userId", Integer.class);
+            Integer userid = claimsJws.getBody().get("userId", Integer.class);
             return Response.createSuccessfulResponse(userid);
         } catch (SignatureException e) {
             return Response.createFailureResponse("Invalid token signature");

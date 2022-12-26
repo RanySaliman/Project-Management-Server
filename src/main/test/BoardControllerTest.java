@@ -65,6 +65,7 @@ public class BoardControllerTest {
 
     @Test
     public void filter_Successfully(){
-        //to be continued
+        boardController.filter(taskFields);
+
     }
 }
