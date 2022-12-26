@@ -24,23 +24,23 @@ public class Board {
     int id;
     @Column(nullable = false)
     String name;
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "BoardMembersAndRoles",
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "userId")
     @Column(name = "userRole")
     Map<User, UserRole> users;
-    @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL)
+    @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL,fetch=FetchType.EAGER)
     Set<Task> tasks;
 
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "BoardTaskTypes",
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @Column(name = "taskType")
      Set<String> taskTypes;
 
 
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "board_statuses",   joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @Column(name = "Status")
     Set<String> statuses;

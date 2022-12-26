@@ -2,7 +2,6 @@ package ProjectManagement.services;
 
 
 import ProjectManagement.controllers.entities.TaskFields;
-import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.BoardRepository;
@@ -23,16 +22,20 @@ public class TaskService {
     @Autowired
     private BoardRepository boardRepository;
 
+
+
     public List<Task> filter(TaskFields filterFields) {
         Integer creator = filterFields.getCreator();
         String title = filterFields.getTitle();
         LocalDateTime dueDate = filterFields.getDueDate();
-        Integer importance = filterFields.getImportance();
-        String description = filterFields.getDescription();
-        Integer taskParentId = filterFields.getTaskParentId();
-        List<Task> filteredTak = taskRepository.findAll().stream().collect(Collectors.toList());
-        if (creator > 0) {
-            filteredTak = filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toList());
+        Integer importance =filterFields.getImportance();
+        String description= filterFields.getDescription();
+        Integer taskParentId= filterFields.getTaskParentId();
+        List<Task>  filteredTak =taskRepository.findAll();
+        System.out.println((filteredTak.size()));
+        if(creator > 0){
+            filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toList());
+
         }
         if (description != null) {
             filteredTak = filteredTak.stream()
@@ -64,7 +67,7 @@ public class TaskService {
         return Response.createSuccessfulResponse(savedTask);
     }
 
-    public List<Task> getAll() {
+    public List<Task> getAll(int boardId) {
         return taskRepository.findAll();
     }
 

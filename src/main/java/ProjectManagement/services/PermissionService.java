@@ -46,6 +46,9 @@ public class PermissionService {
     }
 
     public Response<Void> checkPermission(User user, Board board, UserActions action) {
+        if(board.getUsers() == null){
+            return Response.createFailureResponse("There is no users in the board");
+        }
         UserRole userRole = board.getUsers().get(user);
         if (userRole == null) {
             return Response.createFailureResponse("User doesn't have permission to perform this action");
