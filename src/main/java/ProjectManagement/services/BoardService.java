@@ -43,5 +43,4 @@ public class BoardService {
         boardRepository.deleteById(boardId);
         return Response.createSuccessfulResponse("Board successfully deleted");
     }
-
 }

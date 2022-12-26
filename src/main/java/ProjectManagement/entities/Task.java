@@ -41,22 +41,25 @@ public class Task {
     private int assignedUserId;
     LocalDateTime dueDate;
     private Integer importance; // 1-5 where 5 is the highest priority
-    String title;
-    String description;
-    String status;
-    String type;
+    private String title;
+    private String description;
+    private String status;
+    private  String type;
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "Comments", joinColumns = @JoinColumn(name = "TaskId",referencedColumnName="id", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {"TaskId"}))
     @Column(name = "Comment")
     private Set<Comment> comments;
 
-    public Task(Board board,  int taskParentId, int assignedUserId, int importance, String title, String description) {
+    public Task(Board board,  int taskParentId, int creatorId, int assignedUserId, int importance, String title, String description,String status,String type) {
         this.board=board;
         this.taskParentId = taskParentId;
+        this.creator=creatorId;
         this.assignedUserId = assignedUserId;
         this.dueDate = LocalDateTime.now();
         this.importance = importance;
         this.title = title;
         this.description = description;
+        this.status=status;
+        this.type=type;
     }
 }

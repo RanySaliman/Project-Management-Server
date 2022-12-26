@@ -51,9 +51,10 @@ public class BoardControllerTest {
         board = boardRepository.save(board);
         System.out.println(boardRepository.getBoardById(board.getId()).get());
         tasks = new ArrayList<Task>();
-        task = new Task(board, 2, 1, 2, "first", "2");
+        task = new Task(board, 2, 1, 2,3, "first", "2",board.getStatuses().stream().findFirst().get()
+                    ,board.getTaskTypes().stream().findFirst().get());
         Task save = taskRepository.save(task);
-        System.out.println(taskRepository.findAll());
+        System.out.println(save);
         taskFields = new TaskFields();
         taskFields.setBoardId(board.getId());
         taskFields.setImportance(2);

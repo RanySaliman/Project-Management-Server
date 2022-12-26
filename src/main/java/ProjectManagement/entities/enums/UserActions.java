@@ -2,6 +2,8 @@ package ProjectManagement.entities.enums;
 
 public enum UserActions {
         GetAllUsers,
-        DeleteBoard
+        DeleteBoard,
+        DeleteTask,
+        AddTask;
     }
 
