@@ -8,9 +8,10 @@ import ProjectManagement.entities.Response;
 
 import ProjectManagement.entities.Task;
 import ProjectManagement.entities.User;
-import ProjectManagement.services.AuthService;
+import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.BoardService;
 
+import ProjectManagement.services.PermissionService;
 import ProjectManagement.services.TaskService;
 import ProjectManagement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class BoardController {
     private BoardService boardService;
     @Autowired
     private UserService userService;
-    // @Autowired
-    //private PermissionService permissionService;
+    @Autowired
+    private PermissionService permissionService;
 
     /**
      * end point that responsible for fetching board
@@ -62,17 +63,16 @@ public class BoardController {
             return ResponseEntity.badRequest().body("User not found");
         }
     }
-/*
+
     @PostMapping(value = "deleteBoard/{boardId}")
     public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
-        Response<Boolean> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
+        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId,UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
-            if (checkPermission.getData()) {
-                return ResponseEntity.ok(boardService.deleteBoard(boardId).getData());
-            }else return ResponseEntity.badRequest().body("not permitted to delete board");
-        }else return ResponseEntity.badRequest().body("wrong id");
+            return ResponseEntity.ok(boardService.deleteBoard(boardId).getData());
+        }
+        else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
-*/
+
 
     @GetMapping(value = "/filter")
     public List<Task> filter(@RequestBody TaskFields filterFields) {
@@ -81,7 +81,7 @@ public class BoardController {
 
 
     @GetMapping(value = "/getAllTasks")
-    public List<Task> getAllTasks() {
-        return taskService.getAll();
+    public List<Task> getAllTasks(@RequestParam int boardId)  {
+        return taskService.getAll(boardId);
     }
 }
