@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -68,7 +69,6 @@ public class UserService {
     }
 
 
-
     Response<String> checkIfUserNotExists(String email, String username) {
         if (userRepo.findByEmail(email) != null) {
             return Response.createFailureResponse("User with this email already exists.");
@@ -79,6 +79,14 @@ public class UserService {
         return Response.createSuccessfulResponse("User doesn't exist.");
     }
 
+    public Response<User> getUserById(int id) {
+        Optional<User> user = userRepo.findById(id);
+        if (user.isPresent()) {
+            return Response.createSuccessfulResponse(user.get());
+        } else {
+            return Response.createFailureResponse("User not found.");
+        }
+    }
 
 
 }

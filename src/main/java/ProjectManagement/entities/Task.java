@@ -1,5 +1,6 @@
 package ProjectManagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 
@@ -31,6 +32,7 @@ public class Task {
 ○ Comments
      */
     @ManyToOne
+    @JsonBackReference
     private Board board;
 
     @Id
@@ -45,6 +47,8 @@ public class Task {
     private String description;
     private String status;
     private  String type;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "Comments", joinColumns = @JoinColumn(name = "TaskId",referencedColumnName="id", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {"TaskId"}))
     @Column(name = "Comment")
