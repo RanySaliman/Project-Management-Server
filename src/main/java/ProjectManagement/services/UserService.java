@@ -61,11 +61,25 @@ public class UserService {
                 GithubUser githubUser = getUserInfo.getData();
                 githubUser.setEmail(userEmailFromGithub.getData());
                 User userToSave = new User(githubUser.getEmail(), githubUser.getSiteUsername(), githubUser.getAccessToken(), UserSource.GITHUB);
+                Response<User> userToLogin = isGithubLogin(userToSave);
+                if (userToLogin.isSucceed()) return userToLogin;
                 return registerUser(userToSave);
             } else {
                 return Response.createFailureResponse(getUserInfo.getMessage());
             }
         } else return Response.createFailureResponse(getToken.getMessage());
+    }
+
+    private Response<User> isGithubLogin(User userToSave) {
+        User user = userRepo.findByEmail(userToSave.getEmail());
+        if (user != null && user.getSource() == UserSource.GITHUB) {
+            user.setEmail(userToSave.getEmail());
+            user.setUsername(userToSave.getUsername());
+            user.setPassword(userToSave.getPassword());
+            userRepo.save(user);
+            return Response.createSuccessfulResponse(user);
+        }
+        return Response.createFailureResponse("is not login");
     }
 
 
