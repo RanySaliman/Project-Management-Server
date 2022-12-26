@@ -3,6 +3,7 @@ package ProjectManagement.entities;
 
 
 import ProjectManagement.entities.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,6 +25,8 @@ public class Board {
     int id;
     @Column(nullable = false)
     String name;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "BoardMembersAndRoles",
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
@@ -31,16 +34,21 @@ public class Board {
     @Column(name = "userRole")
     @Enumerated(EnumType.STRING)
     Map<User, UserRole> users;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL,fetch=FetchType.EAGER)
+    @JsonManagedReference
     Set<Task> tasks;
-
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "BoardTaskTypes",
             joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @Column(name = "taskType")
      Set<String> taskTypes;
 
-
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "board_statuses",   joinColumns = {@JoinColumn(name = "board_id", referencedColumnName = "id")})
     @Column(name = "Status")
