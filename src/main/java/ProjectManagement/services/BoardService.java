@@ -1,17 +1,15 @@
 package ProjectManagement.services;
 
 import ProjectManagement.entities.Board;
-import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.Response;
+import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
-import ProjectManagement.repositories.BoardUserRepository;
+import ProjectManagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,8 +17,7 @@ import java.util.Optional;
 public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
-    @Autowired
-    private BoardUserRepository boardUserRepository;
+
 
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
@@ -40,17 +37,14 @@ public class BoardService {
         }
     }
 
-    public Board createBoard(String boardName){
-        return boardRepository.save(new Board(boardName));
+    public Board createBoard(User Creator, String boardName){
+        Board board = new Board(boardName);
+        board.getUsers().put(Creator, UserRole.ADMIN);
+        return boardRepository.save(board) ;
     }
 
     public Response<String> deleteBoard(int boardId){
-        boardUserRepository.deleteByBoardId(boardId);
         boardRepository.deleteById(boardId);
         return Response.createSuccessfulResponse("Board successfully deleted");
-    }
-
-    public BoardToUser addUserToBoard(int userId, int boardId, String userRole){
-        return boardUserRepository.save(new BoardToUser(userId,boardId,userRole));
     }
 }

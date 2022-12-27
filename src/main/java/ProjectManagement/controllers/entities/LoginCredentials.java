@@ -3,10 +3,10 @@ package ProjectManagement.controllers.entities;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
-public class UserToRegister {
-    private String userName;
+public class LoginCredentials {
+   private String email;
     private String password;
-    private String email;
 }

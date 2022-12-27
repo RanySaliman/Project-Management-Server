@@ -1,19 +1,22 @@
 package ProjectManagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
+
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "Task")
+@Table(name = "task")
 public class Task {
+
     /*
     ● Items have the following data:
 ○ Board id
@@ -28,7 +31,10 @@ public class Task {
 ○ Description
 ○ Comments
      */
-    private int boardId;
+    @ManyToOne
+    @JsonBackReference
+    private Board board;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -36,17 +42,28 @@ public class Task {
     private int creator;
     private int assignedUserId;
     LocalDateTime dueDate;
-    int importance; // 1-5 where 5 is the highest priority
-    String title;
-    String description;
+    private Integer importance; // 1-5 where 5 is the highest priority
+    private String title;
+    private String description;
+    private String status;
+    private  String type;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "Comments", joinColumns = @JoinColumn(name = "TaskId",referencedColumnName="id", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {"TaskId"}))
+    @Column(name = "Comment")
+    private Set<Comment> comments;
 
-    public Task(int boardId, int taskParentId, int assignedUserId, int importance, String title, String description) {
-        this.boardId = boardId;
+    public Task(Board board,  int taskParentId, int creatorId, int assignedUserId, int importance, String title, String description,String status,String type) {
+        this.board=board;
         this.taskParentId = taskParentId;
+        this.creator=creatorId;
         this.assignedUserId = assignedUserId;
         this.dueDate = LocalDateTime.now();
         this.importance = importance;
         this.title = title;
         this.description = description;
+        this.status=status;
+        this.type=type;
     }
 }
