@@ -3,8 +3,10 @@ import ProjectManagement.controllers.entities.TaskInput;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
+import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.BoardService;
+import ProjectManagement.services.NotificationsService;
 import ProjectManagement.services.PermissionService;
 import ProjectManagement.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private BoardService boardService;
+    @Autowired
+    private NotificationsService notificationsService;
 
 
     /**
@@ -38,6 +42,7 @@ public class TaskController {
         if (taskResponse.isSucceed()) {
             Response<Task> task = taskService.addTask(taskResponse.getData());
             if (task.isSucceed()) {
+                notificationsService.notificationHappened(task, Events.NewTask);
                 return ResponseEntity.ok(task);
             } else {
                 return ResponseEntity.badRequest().body(task);
@@ -88,6 +93,7 @@ public class TaskController {
             Response<Void> hasPermission = permissionService.checkPermission(userId, task.getData().getBoard().getId(), UserActions.DeleteTask);
             if (hasPermission.isSucceed()) {
                 taskService.deleteTask(taskId);
+                notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
                 return ResponseEntity.ok(task.getData());
             }
         }
