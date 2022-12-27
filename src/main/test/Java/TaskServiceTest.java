@@ -1,6 +1,5 @@
 package Java;
 
-import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.TaskRepository;
@@ -14,10 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static sun.net.www.http.KeepAliveCache.result;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
@@ -40,31 +37,56 @@ public class TaskServiceTest {
     }
 
     @Test
-    void testGetTaskById_withValidBoardId_returnsCorrectBoard() {
+    void testGetTaskById_withValidTaskId_returnsCorrectTask() {
         given(taskRepository.findById(taskId)).willReturn(Optional.of(task));
         Optional<Task> result = taskRepository.findById(taskId);
         assertTrue(result.isPresent());
         assertEquals(task, result.get());
     }
+
     @Test
-    void testGetBoardById_withInValidBoardId_returnsnNoBoard() {
-        given(boardRepo.findById(2L)).willReturn(Optional.empty());
-        Optional<Board> result = boardService.getBoardById(2L);
+    void testDeleteTaskById_withValidTaskId_deletesCorrectTask() {
+        taskRepository.deleteById(taskId);
+        Optional<Task> result = taskRepository.findById(taskId);
         assertFalse(result.isPresent());
     }
 
+    @Test
+    void testDeleteTaskById_withNotValidTaskId_deletesWrongTask() {
+        taskRepository.deleteById(taskId+1);
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(task));
+        Optional<Task> result = taskRepository.findById(taskId);
+        assertTrue(result.isPresent());
+    }
 
     @Test
-    void testAddTask() {
-        Board board = new Board();
-        board.setId(1);
-
-        Task task = new Task(board, 0, 1, 2, 3, "Test Task", "This is a test task", "Open", "Task");
-        Response<Task> response = taskService.addTask(task);
-
-        assertTrue(response.isSuccess());
-        assertEquals(task, response.getData());
+    void testAddTaskById_withValidTaskId_returnsCorrectTask() {
+        Task savedTask = taskRepository.save(task);
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(task));
+        Optional<Task> result = taskRepository.findById(taskId);
+        assertTrue(result.isPresent());
+        assertEquals(task, result.get());
     }
+
+//    @Test
+//    void testGetBoardById_withInValidBoardId_returnsnNoBoard() {
+//        given(boardRepo.findById(2L)).willReturn(Optional.empty());
+//        Optional<Board> result = boardService.getBoardById(2L);
+//        assertFalse(result.isPresent());
+//    }
+
+
+//    @Test
+//    void testAddTask() {
+//        Board board = new Board();
+//        board.setId(1);
+//
+//        Task task = new Task(board, 0, 1, 2, 3, "Test Task", "This is a test task", "Open", "Task");
+//        Response<Task> response = taskService.addTask(task);
+//
+//        assertTrue(response.isSuccess());
+//        assertEquals(task, response.getData());
+//    }
 
 }
 

@@ -4,7 +4,7 @@ package ProjectManagement.controllers;
 import ProjectManagement.controllers.entities.TaskFields;
 
 import ProjectManagement.entities.Board;
-import ProjectManagement.entities.BoardToUser;
+//import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.Response;
 
 import ProjectManagement.entities.Task;
@@ -74,12 +74,12 @@ public class BoardController {
         else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
 
-    @PostMapping(value = "addUserToBoard/{userId}")
-    public ResponseEntity<String> addUserToBoard(@RequestParam int boardId,  @RequestParam("userRole") String userRole, @PathVariable("userId") int userId) {
-        if((boardService.addUserToBoard(boardId,userId,userRole)).getClass()== BoardToUser.class){
-            return ResponseEntity.ok("user added to board");
-        }else return ResponseEntity.badRequest().body("user not added");
-    }
+//    @PostMapping(value = "addUserToBoard/{userId}")
+//    public ResponseEntity<String> addUserToBoard(@RequestParam int boardId,  @RequestParam("userRole") String userRole, @PathVariable("userId") int userId) {
+//        if((boardService.addUserToBoard(boardId,userId,userRole)).getClass()== BoardToUser.class){
+//            return ResponseEntity.ok("user added to board");
+//        }else return ResponseEntity.badRequest().body("user not added");
+//    }
 
     @GetMapping(value = "/filter")
     public List<Task> filter(@RequestBody TaskFields filterFields) {
