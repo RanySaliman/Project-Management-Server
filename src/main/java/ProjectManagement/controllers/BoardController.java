@@ -8,12 +8,10 @@ import ProjectManagement.entities.Response;
 
 import ProjectManagement.entities.Task;
 import ProjectManagement.entities.User;
+import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserActions;
-import ProjectManagement.services.BoardService;
+import ProjectManagement.services.*;
 
-import ProjectManagement.services.PermissionService;
-import ProjectManagement.services.TaskService;
-import ProjectManagement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +26,14 @@ public class BoardController {
 
     @Autowired
     private TaskService taskService;
-
-
     @Autowired
     private BoardService boardService;
     @Autowired
     private UserService userService;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private NotificationsService notificationsService;
 
     /**
      * end point that responsible for fetching board
@@ -57,7 +55,8 @@ public class BoardController {
     public ResponseEntity<String> createBoard(@RequestAttribute("userId") int userId, @RequestParam("name") String boardName) {
         Response<User> user = userService.getUserById(userId);
         if (user.isSucceed()) {
-            boardService.createBoard(user.getData(), boardName);
+            Board board = boardService.createBoard(user.getData(), boardName);
+            notificationsService.notificationHappened(board, Events.NewBoard);
             return ResponseEntity.ok("Board created successfully");
         } else {
             return ResponseEntity.badRequest().body("User not found");
@@ -68,7 +67,8 @@ public class BoardController {
     public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
         Response<Void> checkPermission = permissionService.checkPermission(userId, boardId,UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
-            return ResponseEntity.ok(boardService.deleteBoard(boardId).getData());
+            String tryDelete = boardService.deleteBoard(boardId).getData();
+            return ResponseEntity.ok(tryDelete);
         }
         else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
