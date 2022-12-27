@@ -23,10 +23,23 @@ public class BoardToUser {
     {
         this.userRole=userRole;
     }
-    public BoardToUser(int boardId, int userId) {
+    public BoardToUser(int boardId, int userId, String userRole) {
         this.boardId = boardId;
         this.userId = userId;
+        switch (userRole){
+            case "ADMIN":
+                this.userRole = UserRole.ADMIN;
+                break;
+            case "LEADER":
+                this.userRole = UserRole.LEADER;
+                break;
+            case "REGISTERED":
+                this.userRole = UserRole.REGISTERED;
+                break;
+        }
     }
     public BoardToUser() {
     }
+
+
 }

@@ -1,6 +1,7 @@
 package ProjectManagement.services;
 
 import ProjectManagement.entities.Board;
+import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
@@ -49,4 +50,7 @@ public class BoardService {
         return Response.createSuccessfulResponse("Board successfully deleted");
     }
 
+    public BoardToUser addUserToBoard(int userId, int boardId, String userRole){
+        return boardUserRepository.save(new BoardToUser(userId,boardId,userRole));
+    }
 }

@@ -1,6 +1,7 @@
 package ProjectManagement.controllers;
 
 import ProjectManagement.entities.Board;
+import ProjectManagement.entities.BoardToUser;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.services.AuthService;
@@ -55,6 +56,12 @@ public class BoardController {
         }else return ResponseEntity.badRequest().body("wrong id");
     }
 
+    @PostMapping(value = "addUserToBoard/{userId}")
+    public ResponseEntity<String> addUserToBoard(@RequestParam int boardId,  @RequestParam("userRole") String userRole, @PathVariable("userId") int userId) {
+        if((boardService.addUserToBoard(boardId,userId,userRole)).getClass()== BoardToUser.class){
+            return ResponseEntity.ok("user added to board");
+        }else return ResponseEntity.badRequest().body("user not added");
+    }
 
 
 }
