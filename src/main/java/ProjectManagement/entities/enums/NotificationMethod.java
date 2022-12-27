@@ -4,6 +4,9 @@ public enum NotificationMethod {
     EMAIL_POPUP,
     EMAIL,
     POPUP,
-    NONE
+    NONE;
+    public static boolean NotifyEmail(NotificationMethod notificationMethod){
+        return notificationMethod == EMAIL || notificationMethod == EMAIL_POPUP;
+    }
 }
 

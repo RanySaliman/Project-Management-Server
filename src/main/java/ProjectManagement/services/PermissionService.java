@@ -3,6 +3,7 @@ package ProjectManagement.services;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.User;
+import ProjectManagement.entities.UserInBoard;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
@@ -47,13 +48,13 @@ public class PermissionService {
 
     public Response<Void> checkPermission(User user, Board board, UserActions action) {
         if(board.getUsers() == null){
-            return Response.createFailureResponse("There is no users in the board");
+            return Response.createFailureResponse("There are no users in this board.");
         }
-        UserRole userRole = board.getUsers().get(user);
-        if (userRole == null) {
+        Optional<UserInBoard> usrInBoard = board.getUsers().stream().filter(userInBoard -> userInBoard.getUser().getId() == user.getId()).findFirst();
+        if (!usrInBoard.isPresent()) {
             return Response.createFailureResponse("User doesn't have permission to perform this action");
         }
-        if (PermissionsManager.hasPermission(userRole, action)) {
+        if (PermissionsManager.hasPermission(usrInBoard.get().getUserRole(), action)) {
             return Response.createSuccessfulResponse(null);
         }
         return Response.createFailureResponse("User doesn't have permission to perform this action");
