@@ -50,4 +50,15 @@ public class BoardService {
         boardRepository.deleteById(boardId);
         return Response.createSuccessfulResponse("Board successfully deleted");
     }
+    public Response<String> addUserToBoard(int boardId,UserInBoard userInBoard){
+        Optional<Board> board = boardRepository.getBoardById(boardId);
+        if (!board.isPresent()) {
+            return Response.createFailureResponse("Board not found");
+        }
+        board.get().getUsers().add(userInBoard);
+        boardRepository.save(board.get());
+        return Response.createSuccessfulResponse("User successfully added to board");
+    }
+
+
 }
