@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserToRegister {
-    private String userName;
+    private String username;
     private String password;
     private String email;
 }

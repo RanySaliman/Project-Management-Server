@@ -3,14 +3,13 @@ package ProjectManagement.controllers;
 
 import ProjectManagement.controllers.entities.TaskFields;
 
-import ProjectManagement.entities.Board;
+import ProjectManagement.entities.*;
 //import ProjectManagement.entities.BoardToUser;
-import ProjectManagement.entities.Response;
 
-import ProjectManagement.entities.Task;
-import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.Events;
+import ProjectManagement.entities.enums.NotificationMethod;
 import ProjectManagement.entities.enums.UserActions;
+import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.services.*;
 
@@ -20,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+
+
 import java.util.Set;
 
 @RestController
@@ -46,7 +46,7 @@ public class BoardController {
      * end point that responsible for fetching board
      *
      * @return board
-     * @header id
+     *
      */
     @RequestMapping(value = "getBoard", method = RequestMethod.GET)
     public ResponseEntity<Board> getBoard(@RequestHeader int id) {
@@ -80,12 +80,18 @@ public class BoardController {
         else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
 
-//    @PostMapping(value = "addUserToBoard/{userId}")
-//    public ResponseEntity<String> addUserToBoard(@RequestParam int boardId,  @RequestParam("userRole") String userRole, @PathVariable("userId") int userId) {
-//        if((boardService.addUserToBoard(boardId,userId,userRole)).getClass()== BoardToUser.class){
-//            return ResponseEntity.ok("user added to board");
-//        }else return ResponseEntity.badRequest().body("user not added");
-//    }
+    @PostMapping(value = "addUserToBoard/{userId}")
+    public ResponseEntity<String> addUserToBoard(@RequestParam int boardId,  @RequestParam("userRole") String userRole, @PathVariable("userId") int userId) {
+        Response<User> optionalUser = userService.getUserById(userId);
+        if(optionalUser.isSucceed()) {
+            UserInBoard userInBoard = new UserInBoard(optionalUser.getData(), UserRole.valueOf(userRole), Set.of(NotificationMethod.EMAIL, NotificationMethod.POPUP));
+             Response<String> tryAddUser = boardService.addUserToBoard(boardId, userInBoard);
+             if(tryAddUser.isSucceed()){
+                 return ResponseEntity.ok(tryAddUser.getData());
+             }
+        }
+        return ResponseEntity.badRequest().body("could not add user to board");
+    }
 
     @GetMapping(value = "/filter")
     public List<Task> filter(@RequestBody TaskFields filterFields) {
