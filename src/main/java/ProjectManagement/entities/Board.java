@@ -27,6 +27,7 @@ public class Board {
     @OneToMany(targetEntity=UserInBoard.class, cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name = "board_id")
     Set<UserInBoard> users;
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OneToMany(targetEntity=Task.class,mappedBy = "board" , cascade = CascadeType.ALL,fetch=FetchType.EAGER)
     @JsonManagedReference
@@ -58,7 +59,7 @@ public class Board {
     }
 
     public Optional<UserInBoard> getUser(int id){
-        return this.getUsers().stream().filter(u->u.getUserId()==id).findFirst();
+        return this.getUsers().stream().filter(u->u.getUser().getId()==id).findFirst();
     }
 
 }
