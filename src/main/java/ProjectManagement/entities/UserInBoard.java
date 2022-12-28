@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -23,13 +25,15 @@ public class UserInBoard {
     @Enumerated(EnumType.STRING)
     UserRole userRole;
 
-    // add another field here
-    NotificationMethod notificationMethod;
+    @ElementCollection(fetch=FetchType.EAGER)
+    @CollectionTable(name = "notificationMethods",   joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @Column(name = "notificationMethods")
+   Set<NotificationMethod> notificationMethods;
 
-    public UserInBoard(User user, UserRole userRole, NotificationMethod notificationMethod) {
+    public UserInBoard(User user, UserRole userRole, Set<NotificationMethod> notificationMethods) {
         this.user = user;
         this.userId = user.getId();
         this.userRole = userRole;
-        this.notificationMethod = notificationMethod;
+        this.notificationMethods=new HashSet<>(notificationMethods);
     }
 }

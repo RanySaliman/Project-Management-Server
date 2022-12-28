@@ -19,7 +19,7 @@ public class AuthController {
     private AuthService authService;
     private final Pattern bearerPattern = Pattern.compile("^[Bb]earer\\s+(.*)$");
 
-    @GetMapping("/login")
+    @PostMapping ("/login")
     public ResponseEntity<String> login(@RequestBody LoginCredentials credentials) {
         if (Validation.isValidUserProperties(credentials.getEmail(), credentials.getPassword()).isSucceed()) {
             Response<String> login = authService.login(credentials.getEmail(), credentials.getPassword());

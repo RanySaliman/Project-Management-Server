@@ -29,7 +29,7 @@ public class NotificationsService {
 
     public void notificationHappenedOnBoard(Object o, Board board, Events event) {
         List<String> emailRecipients = board.getUsers().stream().
-                filter(userInBoard -> NotificationMethod.NotifyEmail(userInBoard.getNotificationMethod())).
+                filter(userInBoard -> userInBoard.getNotificationMethods().contains(NotificationMethod.EMAIL)).
                 map(UserInBoard::getUser).map(User::getEmail).collect(Collectors.toList());
         if(emailRecipients.size()>0 ) {
             emailSender.sendEmail(emailRecipients, "Notification", event.name() + "\n" + o.toString());

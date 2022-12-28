@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -40,7 +41,7 @@ public class BoardService {
 
     public Board createBoard(User Creator, String boardName){
         Board board = new Board(boardName);
-        UserInBoard userInBoard = new UserInBoard(Creator, UserRole.ADMIN, NotificationMethod.EMAIL_POPUP);
+        UserInBoard userInBoard = new UserInBoard(Creator, UserRole.ADMIN, Set.of(NotificationMethod.EMAIL,NotificationMethod.POPUP));
         board.getUsers().add(userInBoard);
         return boardRepository.save(board) ;
     }
