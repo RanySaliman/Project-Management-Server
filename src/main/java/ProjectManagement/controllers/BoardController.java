@@ -11,13 +11,17 @@ import ProjectManagement.entities.Task;
 import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserActions;
+import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.services.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @CrossOrigin
@@ -36,6 +40,8 @@ public class BoardController {
     @Autowired
     private NotificationsService notificationsService;
 
+    @Autowired
+    private BoardRepository boardRepository;
     /**
      * end point that responsible for fetching board
      *
@@ -91,4 +97,34 @@ public class BoardController {
     public List<Task> getAllTasks(@RequestParam int boardId)  {
         return taskService.getAll(boardId);
     }
+
+//    @GetMapping(value = "/statusChange")
+//    public Set<String> changeStatus(@RequestParam int taskId, @RequestBody String status){
+//
+//    }
+//
+//    @PutMapping("/{boardId}/statusChange/{status}")
+//    public ResponseEntity<Void> updateBoardStatus(@PathVariable int boardId, @PathVariable String status) {
+//        // Retrieve the board with the given ID
+//        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+//        if (!optionalBoard.isPresent()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        Board board = optionalBoard.get();
+//
+//        // Update the board's status
+//        board.getStatuses().add(status);
+//        boardRepository.save(board);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//
+//    public Board(String name) {
+//        this.name = name;
+//        this.users=new HashSet<>();
+//        this.tasks=new HashSet<>();
+//        this.taskTypes=new HashSet<>(Set.of("Task","Bug","Subtask"));
+//        this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
+//    }
+
 }
