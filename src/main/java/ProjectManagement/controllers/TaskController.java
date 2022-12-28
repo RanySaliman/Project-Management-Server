@@ -42,7 +42,7 @@ public class TaskController {
         if (taskResponse.isSucceed()) {
             Response<Task> task = taskService.addTask(taskResponse.getData());
             if (task.isSucceed()) {
-                notificationsService.notificationHappened(task, Events.NewTask);
+                notificationsService.notificationHappenedOnBoard(task.getData(),task.getData().getBoard(), Events.NewTask);
                 return ResponseEntity.ok(task);
             } else {
                 return ResponseEntity.badRequest().body(task);

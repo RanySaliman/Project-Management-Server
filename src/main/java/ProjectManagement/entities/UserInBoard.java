@@ -5,22 +5,31 @@ import ProjectManagement.entities.enums.UserRole;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Id;
-
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
-@Embeddable
+@Entity
+@Table(name = "UserInBoard")
 public class UserInBoard {
     @Id
+    @Column(name = "user_id")
+    int userId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     User user;
-    UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    UserRole userRole;
+
+    // add another field here
     NotificationMethod notificationMethod;
-    public UserInBoard(User user, UserRole role, NotificationMethod notificationMethod) {
+
+    public UserInBoard(User user, UserRole userRole, NotificationMethod notificationMethod) {
         this.user = user;
-        this.role = role;
+        this.userId = user.getId();
+        this.userRole = userRole;
         this.notificationMethod = notificationMethod;
     }
-
 }
