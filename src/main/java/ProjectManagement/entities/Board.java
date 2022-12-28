@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -54,6 +55,10 @@ public class Board {
         this.tasks=new HashSet<>();
         this.taskTypes=new HashSet<>(Set.of("Task","Bug","Subtask"));
         this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
+    }
+
+    public Optional<UserInBoard> getUser(int id){
+        return this.getUsers().stream().filter(u->u.getUserId()==id).findFirst();
     }
 
 }
