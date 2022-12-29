@@ -33,5 +33,9 @@ public class SocketsUtil {
         return  message;
     }
 
+    public void popupNotification(int id, String eventName) {
+        template.convertAndSend("/topic/notification/" + id, eventName);
+    }
+
 }
 

@@ -2,6 +2,8 @@ package ProjectManagement.services;
 
 
 import ProjectManagement.controllers.entities.TaskFields;
+import ProjectManagement.entities.Board;
+import ProjectManagement.entities.Comment;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
 import ProjectManagement.entities.enums.Events;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,40 +29,40 @@ public class TaskService {
 
 
 
-    public List<Task> filter(TaskFields filterFields) {
+    public Set<Task> filter(Board board, TaskFields filterFields) {
         Integer creator = filterFields.getCreator();
         String title = filterFields.getTitle();
         LocalDateTime dueDate = filterFields.getDueDate();
         Integer importance =filterFields.getImportance();
         String description= filterFields.getDescription();
         Integer taskParentId= filterFields.getTaskParentId();
-        List<Task>  filteredTak =taskRepository.findAll();
+        Set<Task> filteredTak = board.getTasks();
         System.out.println((filteredTak.size()));
         if(creator > 0){
-            filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toList());
+            filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toSet());
 
         }
         if (description != null) {
             filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getDescription(), description)).collect(Collectors.toList());
+                    .filter(task -> Objects.equals(task.getDescription(), description)).collect(Collectors.toSet());
         }
         if (title != null) {
             filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getTitle(), title)).collect(Collectors.toList());
+                    .filter(task -> Objects.equals(task.getTitle(), title)).collect(Collectors.toSet());
         }
 
         if (dueDate != null) {
             filteredTak = filteredTak.stream()
-                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toList());
+                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toSet());
         }
         if (importance > 0) {
             filteredTak = filteredTak.stream()
-                    .filter(task -> task.getImportance() == importance).collect(Collectors.toList());
+                    .filter(task -> task.getImportance() == importance).collect(Collectors.toSet());
         }
 
         if (taskParentId > 0) {
             filteredTak = filteredTak.stream()
-                    .filter(task -> task.getTaskParentId() == taskParentId).collect(Collectors.toList());
+                    .filter(task -> task.getTaskParentId() == taskParentId).collect(Collectors.toSet());
         }
         return filteredTak;
     }
@@ -67,10 +70,6 @@ public class TaskService {
     public Response<Task> addTask(Task task) {
         Task savedTask = taskRepository.save(task);
         return Response.createSuccessfulResponse(savedTask);
-    }
-
-    public List<Task> getAll(int boardId) {
-        return taskRepository.findAll();
     }
 
     public Response<Task> getTask(int taskId) {
@@ -87,4 +86,16 @@ public class TaskService {
         return Response.createSuccessfulResponse(null);
     }
 
+    public void updateTaskStatus(Task task, String status){
+        task.setStatus(status);
+        taskRepository.save(task);
+    }
+    public void updateTaskType(Task task, String type){
+        task.setType(type);
+        taskRepository.save(task);
+    }
+    public Task addComment(Task task, Comment comment){
+        task.getComments().add(comment);
+        return taskRepository.save(task);
+    }
 }

@@ -2,12 +2,15 @@ package ProjectManagement.controllers;
 
 import ProjectManagement.controllers.entities.TaskInput;
 import ProjectManagement.entities.Board;
+import ProjectManagement.entities.Comment;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;
 import ProjectManagement.entities.User;
 import ProjectManagement.entities.annotations.AccessLevel;
 import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserRole;
+import ProjectManagement.entities.enums.UserActions;
+import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.services.BoardService;
 import ProjectManagement.services.NotificationsService;
 import ProjectManagement.services.TaskService;
@@ -28,21 +31,27 @@ public class TaskController {
     private BoardService boardService;
     @Autowired
     private NotificationsService notificationsService;
+    @Autowired
+    private BoardRepository boardRepository;
 
 
     /**
+     * end point that responsible for adding a task
+     * <p>
      * end point that responsible for fetching task
+     *
      * @param fields - task fields
-     * @return if succeed - task, else - error message
+     * @return if succeed - task added, else - error message
      */
     @AccessLevel(UserRole.LEADER)
     @PostMapping(value = "addTask")
     public ResponseEntity<Response<Task>> addTask(@RequestAttribute("user") User user, @RequestAttribute("board") Board board, @RequestBody TaskInput fields) {
-        Response<Task> taskResponse = fromTaskInput(user.getId(), board,fields);
+        Response<Task> taskResponse = fromTaskInput(user.getId(), board, fields);
         if (taskResponse.isSucceed()) {
             Response<Task> task = taskService.addTask(taskResponse.getData());
             if (task.isSucceed()) {
                 notificationsService.notificationHappenedOnBoard(task.getData(), task.getData().getBoard(), Events.NewTask);
+                notificationsService.popNotificationHappenedOnBoard(task.getData(), task.getData().getBoard(), Events.NewTask);
                 return ResponseEntity.ok(task);
             } else {
                 return ResponseEntity.badRequest().body(task);
@@ -80,10 +89,45 @@ public class TaskController {
     public ResponseEntity<Task> deleteTask(@RequestAttribute("user") User user, @PathVariable("taskId") int taskId) {
         Response<Task> task = taskService.getTask(taskId);
         if (task.isSucceed()) {
-                taskService.deleteTask(taskId);
-                notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
-                return ResponseEntity.ok(task.getData());
+            taskService.deleteTask(taskId);
+            notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
+            return ResponseEntity.ok(task.getData());
         }
         return ResponseEntity.badRequest().body(null);
+    }
+
+    @AccessLevel(UserRole.REGISTERED)
+    @PutMapping("/statusUpdate/{task}/{status}")
+    public ResponseEntity<Void> updateTaskStatus(@RequestAttribute("board") Board board, @PathVariable("status") String status, @PathVariable("task") int taskId) {
+
+        Response<Task> task = taskService.getTask(taskId);
+        if (task.isSucceed()) {
+            // Update the board's status
+            boardService.updateBoardStatus(board,status);
+            taskService.updateTaskStatus(task.getData(),status);
+            return ResponseEntity.noContent().build();
+        }else return ResponseEntity.badRequest().body(null);
+    }
+    @AccessLevel(UserRole.REGISTERED)
+    @PutMapping("/typeUpdate/{task}/{type}")
+    public ResponseEntity<Void> updateTaskType(@RequestAttribute("board") Board board, @PathVariable("type") String type, @PathVariable("task") int taskId) {
+
+        Response<Task> task = taskService.getTask(taskId);
+        if (task.isSucceed()) {
+            // Update the board's status
+            boardService.updateBoardType(board,type);
+            taskService.updateTaskType(task.getData(),type);
+            return ResponseEntity.noContent().build();
+        }else return ResponseEntity.badRequest().body(null);
+    }
+
+    @PostMapping(value = "addComment/{taskId}")
+    public ResponseEntity<Response<Task>> addComment(@RequestAttribute("user") User user, @RequestBody String content, @PathVariable int taskId) {
+        Comment comment = new Comment(content,user);
+        Response<Task> task = taskService.getTask(taskId);
+        if(task.isSucceed()){
+            taskService.addComment(task.getData(), comment);
+            return ResponseEntity.ok(Response.createSuccessfulResponse(taskService.addComment(task.getData(), comment)));
+        }else return ResponseEntity.badRequest().body(Response.createFailureResponse("task not found"));
     }
 }

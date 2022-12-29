@@ -5,14 +5,19 @@ import ProjectManagement.controllers.entities.TaskFields;
 import ProjectManagement.entities.*;
 import ProjectManagement.entities.annotations.AccessLevel;
 import ProjectManagement.entities.enums.Events;
+import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.entities.enums.UserRole;
+import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.services.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @CrossOrigin
@@ -30,9 +35,13 @@ public class BoardController {
     @Autowired
     private NotificationsService notificationsService;
 
+    @Autowired
+    private BoardRepository boardRepository;
     /**
      * end point that responsible for fetching board
+     *
      * @return board
+     * @header id
      */
     @AccessLevel(UserRole.REGISTERED)
     @RequestMapping(value = "getBoard", method = RequestMethod.GET)
@@ -57,7 +66,7 @@ public class BoardController {
     }
 
     @AccessLevel(UserRole.ADMIN)
-    @PostMapping(value = "deleteBoard/{boardId}")
+    @PostMapping(value = "deleteBoard")
     public ResponseEntity<String> deleteBoard( @RequestAttribute("board") Board board) {
         boardService.deleteBoard(board);
         return ResponseEntity.ok("Board deleted successfully");
@@ -73,45 +82,16 @@ public class BoardController {
         }
         return ResponseEntity.badRequest().body("could not add user to board");
     }
-
+    @AccessLevel(UserRole.REGISTERED)
     @GetMapping(value = "/filter")
-    public List<Task> filter(@RequestBody TaskFields filterFields) {
-        return taskService.filter(filterFields);
+    public Set<Task> filter(@RequestAttribute("board") Board board, @RequestBody TaskFields filterFields) {
+        return taskService.filter(board, filterFields);
     }
 
-
+    @AccessLevel(UserRole.REGISTERED)
     @GetMapping(value = "/getAllTasks")
-    public List<Task> getAllTasks(@RequestParam int boardId) {
-        return taskService.getAll(boardId);
+    public Set<Task> getAllTasks(@RequestAttribute("board") Board board) {
+        return boardService.getAllTasks(board);
     }
-
-//    @GetMapping(value = "/statusChange")
-//    public Set<String> changeStatus(@RequestParam int taskId, @RequestBody String status){
-//
-//    }
-//
-//    @PutMapping("/{boardId}/statusChange/{status}")
-//    public ResponseEntity<Void> updateBoardStatus(@PathVariable int boardId, @PathVariable String status) {
-//        // Retrieve the board with the given ID
-//        Optional<Board> optionalBoard = boardRepository.findById(boardId);
-//        if (!optionalBoard.isPresent()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        Board board = optionalBoard.get();
-//
-//        // Update the board's status
-//        board.getStatuses().add(status);
-//        boardRepository.save(board);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//
-//    public Board(String name) {
-//        this.name = name;
-//        this.users=new HashSet<>();
-//        this.tasks=new HashSet<>();
-//        this.taskTypes=new HashSet<>(Set.of("Task","Bug","Subtask"));
-//        this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
-//    }
 
 }
