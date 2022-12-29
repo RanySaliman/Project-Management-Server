@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -14,9 +13,12 @@ import java.util.Set;
 @Entity
 @Table(name = "UserInBoard")
 public class UserInBoard {
-    @Id
-    @Column(name = "user_id")
-    int userId;
+    @EmbeddedId
+    UserInBoardId id;
+
+    @ManyToOne
+    @JoinColumn(name = "board_id", insertable = false, updatable = false)
+    Board board;
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
@@ -25,15 +27,8 @@ public class UserInBoard {
     @Enumerated(EnumType.STRING)
     UserRole userRole;
 
-    @ElementCollection(fetch=FetchType.EAGER)
-    @CollectionTable(name = "notificationMethods",   joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")})
-    @Column(name = "notificationMethods")
-   Set<NotificationMethod> notificationMethods;
-
-    public UserInBoard(User user, UserRole userRole, Set<NotificationMethod> notificationMethods) {
-        this.user = user;
-        this.userId = user.getId();
-        this.userRole = userRole;
-        this.notificationMethods=new HashSet<>(notificationMethods);
-    }
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "NotificationMethods", joinColumns = {@JoinColumn(name = "user_id"),@JoinColumn(name = "board_id")})
+    @Column(name = "notification_method")
+    Set<NotificationMethod> NotificationMethods;
 }

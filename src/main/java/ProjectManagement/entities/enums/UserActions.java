@@ -4,6 +4,9 @@ public enum UserActions {
         GetAllUsers,
         DeleteBoard,
         DeleteTask,
-        AddTask;
+        AddTask,
+
+    AddUserToBoard;
+
     }
 
