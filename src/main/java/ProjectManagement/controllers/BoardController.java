@@ -12,6 +12,7 @@ import ProjectManagement.entities.User;
 import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.repositories.BoardRepository;
+import ProjectManagement.repositories.TaskRepository;
 import ProjectManagement.services.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,10 @@ public class BoardController {
     private NotificationsService notificationsService;
 
     @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
     private BoardRepository boardRepository;
+
     /**
      * end point that responsible for fetching board
      *
@@ -71,13 +75,12 @@ public class BoardController {
     }
 
     @PostMapping(value = "deleteBoard/{boardId}")
-    public ResponseEntity<String> deleteBoard(@RequestParam int userId,@PathVariable("boardId") int boardId) {
-        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId,UserActions.DeleteBoard);
+    public ResponseEntity<String> deleteBoard(@RequestParam int userId, @PathVariable("boardId") int boardId) {
+        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
         if (checkPermission.isSucceed()) {
             String tryDelete = boardService.deleteBoard(boardId).getData();
             return ResponseEntity.ok(tryDelete);
-        }
-        else return ResponseEntity.badRequest().body("not permitted to delete board");
+        } else return ResponseEntity.badRequest().body("not permitted to delete board");
     }
 
 //    @PostMapping(value = "addUserToBoard/{userId}")
@@ -94,7 +97,7 @@ public class BoardController {
 
 
     @GetMapping(value = "/getAllTasks")
-    public List<Task> getAllTasks(@RequestParam int boardId)  {
+    public List<Task> getAllTasks(@RequestParam int boardId) {
         return taskService.getAll(boardId);
     }
 
@@ -102,23 +105,14 @@ public class BoardController {
 //    public Set<String> changeStatus(@RequestParam int taskId, @RequestBody String status){
 //
 //    }
-//
-//    @PutMapping("/{boardId}/statusChange/{status}")
-//    public ResponseEntity<Void> updateBoardStatus(@PathVariable int boardId, @PathVariable String status) {
-//        // Retrieve the board with the given ID
-//        Optional<Board> optionalBoard = boardRepository.findById(boardId);
-//        if (!optionalBoard.isPresent()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        Board board = optionalBoard.get();
-//
-//        // Update the board's status
-//        board.getStatuses().add(status);
-//        boardRepository.save(board);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//
+
+
+    // Retrieve the board with the given ID
+
+
+}
+
+
 //    public Board(String name) {
 //        this.name = name;
 //        this.users=new HashSet<>();
@@ -127,4 +121,4 @@ public class BoardController {
 //        this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
 //    }
 
-}
+

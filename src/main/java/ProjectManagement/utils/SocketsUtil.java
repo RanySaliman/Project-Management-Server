@@ -33,5 +33,9 @@ public class SocketsUtil {
         return  message;
     }
 
+    public void updateTask(int id, String receiver) {
+        template.convertAndSendToUser(receiver, "/topic/notification/" + id, id);
+    }
+
 }
 

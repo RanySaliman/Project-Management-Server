@@ -41,4 +41,15 @@ public class NotificationsService {
             emailSender.sendEmail(emailRecipients, "Notification", event.name() + "\n" + o.toString());
         }
     }
+
+    public void popNotificationHappenedOnBoard(Object o, Board board, Events event) {
+        List<Integer> popUpRecipients = board.getUsers().stream().
+                filter(userInBoard -> userInBoard.getNotificationMethods().contains(NotificationMethod.POPUP)).
+                map(UserInBoard::getUser).map(User::getId).collect(Collectors.toList());
+        if(popUpRecipients.size()>0 ) {
+            for (Integer id:popUpRecipients) {
+                socketsUtil.updateTask(id, event.name());
+            }
+        }
+    }
 }
