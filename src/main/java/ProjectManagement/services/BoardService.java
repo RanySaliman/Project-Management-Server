@@ -1,12 +1,10 @@
 package ProjectManagement.services;
 
-import ProjectManagement.entities.Board;
-import ProjectManagement.entities.Response;
-import ProjectManagement.entities.User;
-import ProjectManagement.entities.UserInBoard;
+import ProjectManagement.entities.*;
 import ProjectManagement.entities.enums.NotificationMethod;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.repositories.BoardRepository;
+import ProjectManagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +17,30 @@ import java.util.Set;
 public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
     }
-
+    public Response<Board> addUserToBoard(int boardId, int userId, UserRole userRole) {
+        Optional<User> user = userRepository.findById(userId);
+        Optional<Board> board = boardRepository.findById(boardId);
+        if(!user.isPresent()|| !board.isPresent()){
+            return Response.createFailureResponse(String.format("User with id: %d does not exist", userId));
+        }
+        return Response.createSuccessfulResponse(addUserToBoard(user.get(),board.get(), userRole));
+    }
+    public Board addUserToBoard(User user,Board board,UserRole userRole){
+        UserInBoard userInBoard = new UserInBoard();
+        userInBoard.setId(new UserInBoardId(board.getId(), user.getId()));
+        userInBoard.setUser(user);
+        userInBoard.setUserRole(userRole);
+        userInBoard.setNotificationMethods(Set.of(NotificationMethod.EMAIL, NotificationMethod.POPUP));
+        board.getUsers().add(userInBoard);
+       return boardRepository.save(board);
+    }
     /**
      * method that responsible for fetching board for specific board id
      * @param id
@@ -39,15 +55,14 @@ public class BoardService {
         }
     }
 
-    public Board createBoard(User Creator, String boardName){
+    public Response<Board> createBoard(User Creator, String boardName){
         Board board = new Board(boardName);
-        UserInBoard userInBoard = new UserInBoard(Creator, UserRole.ADMIN, Set.of(NotificationMethod.EMAIL,NotificationMethod.POPUP));
-        board.getUsers().add(userInBoard);
-        return boardRepository.save(board) ;
+        boardRepository.save(board);
+        return Response.createSuccessfulResponse(addUserToBoard(Creator,board, UserRole.ADMIN));
     }
 
-    public Response<String> deleteBoard(int boardId){
-        boardRepository.deleteById(boardId);
+    public Response<String> deleteBoard(Board board){
+        boardRepository.delete(board);
         return Response.createSuccessfulResponse("Board successfully deleted");
     }
     public Response<String> addUserToBoard(int boardId,UserInBoard userInBoard){
