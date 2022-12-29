@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class UserService {
 
 
     @Autowired
-    public UserService(UserRepository userRepo, GithubOAuthApi githubOAuthApi, EmailSender emailSender) {
+    public UserService(UserRepository userRepo, GithubOAuthApi githubOAuthApi, EmailSender emailSender, EntityManager entityManager) {
         this.emailSender = emailSender;
         this.userRepo = userRepo;
         this.githubOAuthApi = githubOAuthApi;
@@ -102,6 +103,13 @@ public class UserService {
         }
     }
 
-
+    public Response<User> getUserByName(String name) {
+        User user = userRepo.findByUsername(name);
+        if (user != null) {
+            return Response.createSuccessfulResponse(user);
+        } else {
+            return Response.createFailureResponse("User not found.");
+        }
+    }
 }
 

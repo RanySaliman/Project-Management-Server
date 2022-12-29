@@ -2,17 +2,11 @@ package ProjectManagement.controllers;
 
 
 import ProjectManagement.controllers.entities.TaskFields;
-
-import ProjectManagement.entities.Board;
-//import ProjectManagement.entities.BoardToUser;
-import ProjectManagement.entities.Response;
-
-import ProjectManagement.entities.Task;
-import ProjectManagement.entities.User;
+import ProjectManagement.entities.*;
+import ProjectManagement.entities.annotations.AccessLevel;
 import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserActions;
 import ProjectManagement.repositories.BoardRepository;
-import ProjectManagement.repositories.TaskRepository;
 import ProjectManagement.services.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,44 +30,41 @@ public class BoardController {
     private BoardService boardService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private PermissionService permissionService;
+
     @Autowired
     private NotificationsService notificationsService;
 
     @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
     private BoardRepository boardRepository;
-
     /**
      * end point that responsible for fetching board
      *
      * @return board
      * @header id
      */
+    @AccessLevel(UserRole.REGISTERED)
     @RequestMapping(value = "getBoard", method = RequestMethod.GET)
-    public ResponseEntity<Board> getBoard(@RequestHeader int id) {
-        Response<Board> board = boardService.getBoard(id);
-        if (board.isSucceed()) {
-            return ResponseEntity.ok(board.getData());
-        } else {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Board> getBoard(@RequestAttribute("board")Board board) {
+            return ResponseEntity.ok(board);
     }
 
     @PostMapping(value = "createBoard")
-    public ResponseEntity<String> createBoard(@RequestAttribute("userId") int userId, @RequestParam("name") String boardName) {
+    public ResponseEntity<Object> createBoard(@RequestAttribute("userId") int userId, @RequestParam("name") String boardName) {
         Response<User> user = userService.getUserById(userId);
         if (user.isSucceed()) {
-            Board board = boardService.createBoard(user.getData(), boardName);
-            notificationsService.notificationHappened(board, Events.NewBoard);
-            return ResponseEntity.ok("Board created successfully");
+            Response<Board> optionalBoard = boardService.createBoard(user.getData(), boardName);
+            if (optionalBoard.isSucceed()) {
+                notificationsService.notificationHappened(optionalBoard.getData(), Events.NewBoard);
+                return ResponseEntity.ok(optionalBoard.getData());
+            } else {
+                return ResponseEntity.badRequest().body("Cannot create a board because " + optionalBoard.getMessage());
+            }
         } else {
             return ResponseEntity.badRequest().body("User not found");
         }
     }
 
+    @AccessLevel(UserRole.ADMIN)
     @PostMapping(value = "deleteBoard/{boardId}")
     public ResponseEntity<String> deleteBoard(@RequestParam int userId, @PathVariable("boardId") int boardId) {
         Response<Void> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.DeleteBoard);
@@ -81,6 +72,20 @@ public class BoardController {
             String tryDelete = boardService.deleteBoard(boardId).getData();
             return ResponseEntity.ok(tryDelete);
         } else return ResponseEntity.badRequest().body("not permitted to delete board");
+    public ResponseEntity<String> deleteBoard( @RequestAttribute("board") Board board) {
+        boardService.deleteBoard(board);
+        return ResponseEntity.ok("Board deleted successfully");
+    }
+
+    @AccessLevel(UserRole.ADMIN)
+    @PostMapping(value = "addUserToBoard/{boardId}")
+    public ResponseEntity<String> addUserToBoard(@RequestAttribute("user") User user, @RequestAttribute("board") Board board, @RequestParam("userRole") String userRole, @RequestParam("adduser") String userNameToAdd) {
+        Response<User> optionalUser = userService.getUserByName(userNameToAdd);
+        if (optionalUser.isSucceed()) {
+            boardService.addUserToBoard(optionalUser.getData(), board, UserRole.valueOf(userRole));
+            return ResponseEntity.ok("User added successfully");
+        }
+        return ResponseEntity.badRequest().body("could not add user to board");
     }
 
 //    @PostMapping(value = "addUserToBoard/{userId}")
@@ -121,4 +126,4 @@ public class BoardController {
 //        this.statuses=new HashSet<>(Set.of("Open","In Progress","Done"));
 //    }
 
-
+}

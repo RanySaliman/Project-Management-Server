@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.User;
 import ProjectManagement.entities.UserInBoard;
+import ProjectManagement.entities.UserInBoardId;
 import ProjectManagement.entities.enums.UserRole;
 import ProjectManagement.entities.enums.UserSource;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,11 @@ class BoardTest {
     @Test
     void testAddUser() {
         User user = new User("rany@gmail.com","ranysaliman","123456", UserSource.GITHUB);
-        UserInBoard userInBoard = new UserInBoard(user,UserRole.REGISTERED, Set.of());
-
+        UserInBoard userInBoard = new UserInBoard();
+        userInBoard.setUser(user);
+        userInBoard.setUserRole(UserRole.ADMIN);
         Board board = new Board("Test Board");
-
+        userInBoard.setId(new UserInBoardId(board.getId(), user.getId()));
         board.getUsers().add(userInBoard);
         assertTrue(board.getUsers().contains(userInBoard));
         assertEquals(UserRole.REGISTERED, board.getUser(user.getId()).get().getUserRole());
