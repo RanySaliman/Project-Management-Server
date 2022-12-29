@@ -48,7 +48,7 @@ public class NotificationsService {
                 map(UserInBoard::getUser).map(User::getId).collect(Collectors.toList());
         if(popUpRecipients.size()>0 ) {
             for (Integer id:popUpRecipients) {
-                socketsUtil.updateTask(id, event.name());
+                socketsUtil.popupNotification(id, event.name());
             }
         }
     }

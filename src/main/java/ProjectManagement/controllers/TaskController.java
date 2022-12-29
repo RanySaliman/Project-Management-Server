@@ -37,21 +37,21 @@ public class TaskController {
 
     /**
      * end point that responsible for adding a task
-     *
+     * <p>
      * end point that responsible for fetching task
+     *
      * @param fields - task fields
      * @return if succeed - task added, else - error message
      */
     @AccessLevel(UserRole.LEADER)
     @PostMapping(value = "addTask")
     public ResponseEntity<Response<Task>> addTask(@RequestAttribute("user") User user, @RequestAttribute("board") Board board, @RequestBody TaskInput fields) {
-        Response<Task> taskResponse = fromTaskInput(user.getId(), board,fields);
+        Response<Task> taskResponse = fromTaskInput(user.getId(), board, fields);
         if (taskResponse.isSucceed()) {
             Response<Task> task = taskService.addTask(taskResponse.getData());
             if (task.isSucceed()) {
-                notificationsService.notificationHappenedOnBoard(task.getData(),task.getData().getBoard(), Events.NewTask);
-                notificationsService.popNotificationHappenedOnBoard(task.getData(),task.getData().getBoard(), Events.NewTask);
                 notificationsService.notificationHappenedOnBoard(task.getData(), task.getData().getBoard(), Events.NewTask);
+                notificationsService.popNotificationHappenedOnBoard(task.getData(), task.getData().getBoard(), Events.NewTask);
                 return ResponseEntity.ok(task);
             } else {
                 return ResponseEntity.badRequest().body(task);
@@ -89,64 +89,45 @@ public class TaskController {
     public ResponseEntity<Task> deleteTask(@RequestAttribute("user") User user, @PathVariable("taskId") int taskId) {
         Response<Task> task = taskService.getTask(taskId);
         if (task.isSucceed()) {
-                taskService.deleteTask(taskId);
-                notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
-                return ResponseEntity.ok(task.getData());
+            taskService.deleteTask(taskId);
+            notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
+            return ResponseEntity.ok(task.getData());
         }
         return ResponseEntity.badRequest().body(null);
     }
 
-    @PutMapping("/{boardId}/statusUpdate/{task}/{status}")
-    public ResponseEntity<Void> updateBoardStatus(@PathVariable int boardId, @PathVariable("status") String status, @PathVariable("task") int taskId, @RequestAttribute("userId") int userId) {
-        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.ChangeStatus);
-        if (checkPermission.isSucceed()) {
-            Response<Board> optionalBoard = boardService.getBoard(boardId);
-            if (!optionalBoard.isSucceed()) {
-                return ResponseEntity.notFound().build();
-            }
+    @AccessLevel(UserRole.REGISTERED)
+    @PutMapping("/statusUpdate/{task}/{status}")
+    public ResponseEntity<Void> updateTaskStatus(@RequestAttribute("board") Board board, @PathVariable("status") String status, @PathVariable("task") int taskId) {
 
-            Board board = optionalBoard.getData();
-            Response<Task> task = taskService.getTask(taskId);
+        Response<Task> task = taskService.getTask(taskId);
+        if (task.isSucceed()) {
             // Update the board's status
-            board.getStatuses().add(status);
-            task.getData().setStatus(status);
-            boardRepository.save(board);
+            boardService.updateBoardStatus(board,status);
+            taskService.updateTaskStatus(task.getData(),status);
             return ResponseEntity.noContent().build();
-        } else return ResponseEntity.badRequest().body(null);
+        }else return ResponseEntity.badRequest().body(null);
+    }
+    @AccessLevel(UserRole.REGISTERED)
+    @PutMapping("/typeUpdate/{task}/{type}")
+    public ResponseEntity<Void> updateTaskType(@RequestAttribute("board") Board board, @PathVariable("type") String type, @PathVariable("task") int taskId) {
+
+        Response<Task> task = taskService.getTask(taskId);
+        if (task.isSucceed()) {
+            // Update the board's status
+            boardService.updateBoardType(board,type);
+            taskService.updateTaskType(task.getData(),type);
+            return ResponseEntity.noContent().build();
+        }else return ResponseEntity.badRequest().body(null);
     }
 
-    @PutMapping("/{boardId}/typeUpdate/{task}/{type}")
-    public ResponseEntity<Void> updateBoardType(@PathVariable int boardId, @PathVariable("type") String type, @PathVariable("task") int taskId, @RequestAttribute("userId") int userId) {
-        Response<Void> checkPermission = permissionService.checkPermission(userId, boardId, UserActions.ChangeStatus);
-        if (checkPermission.isSucceed()) {
-            Response<Board> optionalBoard = boardService.getBoard(boardId);
-            if (!optionalBoard.isSucceed()) {
-                return ResponseEntity.notFound().build();
-            }
-            Board board = optionalBoard.getData();
-            Response<Task> task = taskService.getTask(taskId);
-            // Update the board's type
-            board.getTaskTypes().add(type);
-            task.getData().setType(type);
-            boardRepository.save(board);
-            return ResponseEntity.noContent().build();
-        } else return ResponseEntity.badRequest().body(null);
-    }
-
-    @PostMapping(value = "addComment")
-    public ResponseEntity<Response<Task>> addComment(@RequestAttribute("userId") int userId, @RequestBody String comment) {
-        Response<Comment> commentResponse = Comment();
-        if (commentResponse.isSucceed()) {
-            Response<Task> task = taskService.addTask(taskResponse.getData());
-            if (task.isSucceed()) {
-                notificationsService.notificationHappenedOnBoard(task.getData(),task.getData().getBoard(), Events.NewTask);
-                notificationsService.popNotificationHappenedOnBoard(task.getData(),task.getData().getBoard(), Events.NewTask);
-                return ResponseEntity.ok(task);
-            } else {
-                return ResponseEntity.badRequest().body(task);
-            }
-        } else {
-            return ResponseEntity.badRequest().body(taskResponse);
-        }
+    @PostMapping(value = "addComment/{taskId}")
+    public ResponseEntity<Response<Task>> addComment(@RequestAttribute("user") User user, @RequestBody String content, @PathVariable int taskId) {
+        Comment comment = new Comment(content,user);
+        Response<Task> task = taskService.getTask(taskId);
+        if(task.isSucceed()){
+            taskService.addComment(task.getData(), comment);
+            return ResponseEntity.ok(Response.createSuccessfulResponse(taskService.addComment(task.getData(), comment)));
+        }else return ResponseEntity.badRequest().body(Response.createFailureResponse("task not found"));
     }
 }

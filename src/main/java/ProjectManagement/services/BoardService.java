@@ -24,48 +24,53 @@ public class BoardService {
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
     }
+
     public Response<Board> addUserToBoard(int boardId, int userId, UserRole userRole) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Board> board = boardRepository.findById(boardId);
-        if(!user.isPresent()|| !board.isPresent()){
+        if (!user.isPresent() || !board.isPresent()) {
             return Response.createFailureResponse(String.format("User with id: %d does not exist", userId));
         }
-        return Response.createSuccessfulResponse(addUserToBoard(user.get(),board.get(), userRole));
+        return Response.createSuccessfulResponse(addUserToBoard(user.get(), board.get(), userRole));
     }
-    public Board addUserToBoard(User user,Board board,UserRole userRole){
+
+    public Board addUserToBoard(User user, Board board, UserRole userRole) {
         UserInBoard userInBoard = new UserInBoard();
         userInBoard.setId(new UserInBoardId(board.getId(), user.getId()));
         userInBoard.setUser(user);
         userInBoard.setUserRole(userRole);
         userInBoard.setNotificationMethods(Set.of(NotificationMethod.EMAIL, NotificationMethod.POPUP));
         board.getUsers().add(userInBoard);
-       return boardRepository.save(board);
+        return boardRepository.save(board);
     }
+
     /**
      * method that responsible for fetching board for specific board id
+     *
      * @param id
      * @return board
      */
     public Response<Board> getBoard(int id) {
         Optional<Board> board = boardRepository.findById(id);
-        if (!board.isPresent()){
+        if (!board.isPresent()) {
             return Response.createFailureResponse("");
-        }else {
+        } else {
             return Response.createSuccessfulResponse(board.get());
         }
     }
 
-    public Response<Board> createBoard(User Creator, String boardName){
+    public Response<Board> createBoard(User Creator, String boardName) {
         Board board = new Board(boardName);
         boardRepository.save(board);
-        return Response.createSuccessfulResponse(addUserToBoard(Creator,board, UserRole.ADMIN));
+        return Response.createSuccessfulResponse(addUserToBoard(Creator, board, UserRole.ADMIN));
     }
 
-    public Response<String> deleteBoard(Board board){
+    public Response<String> deleteBoard(Board board) {
         boardRepository.delete(board);
         return Response.createSuccessfulResponse("Board successfully deleted");
     }
-    public Response<String> addUserToBoard(int boardId,UserInBoard userInBoard){
+
+    public Response<String> addUserToBoard(int boardId, UserInBoard userInBoard) {
         Optional<Board> board = boardRepository.getBoardById(boardId);
         if (!board.isPresent()) {
             return Response.createFailureResponse("Board not found");
@@ -75,5 +80,19 @@ public class BoardService {
         return Response.createSuccessfulResponse("User successfully added to board");
     }
 
+    public Set<Task> getAllTasks(Board board) {
+        return board.getTasks();
+    }
 
+    public void updateBoardStatus(Board board, String status) {
+        if (board.getStatuses().add(status)) {
+            boardRepository.save(board);
+        }
+    }
+
+    public void updateBoardType(Board board, String taskType) {
+        if (board.getTaskTypes().add(taskType)) {
+            boardRepository.save(board);
+        }
+    }
 }

@@ -19,7 +19,7 @@ class BoardTest {
         User user = new User("rany@gmail.com","ranysaliman","123456", UserSource.GITHUB);
         UserInBoard userInBoard = new UserInBoard();
         userInBoard.setUser(user);
-        userInBoard.setUserRole(UserRole.ADMIN);
+        userInBoard.setUserRole(UserRole.REGISTERED);
         Board board = new Board("Test Board");
         userInBoard.setId(new UserInBoardId(board.getId(), user.getId()));
         board.getUsers().add(userInBoard);

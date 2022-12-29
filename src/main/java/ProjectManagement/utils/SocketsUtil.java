@@ -33,8 +33,8 @@ public class SocketsUtil {
         return  message;
     }
 
-    public void updateTask(int id, String receiver) {
-        template.convertAndSendToUser(receiver, "/topic/notification/" + id, id);
+    public void popupNotification(int id, String eventName) {
+        template.convertAndSend("/topic/notification/" + id, eventName);
     }
 
 }

@@ -58,16 +58,15 @@ public class BoardControllerTest {
         Task save = taskRepository.save(task);
         System.out.println(save);
         taskFields = new TaskFields();
-        taskFields.setBoardId(board.getId());
         taskFields.setImportance(2);
-        System.out.println(boardController.filter(taskFields));
+        System.out.println(boardController.filter(board,taskFields));
 
 
     }
 
     @Test
     public void filter_Successfully(){
-        boardController.filter(taskFields);
+        boardController.filter(board, taskFields);
 
     }
 }
