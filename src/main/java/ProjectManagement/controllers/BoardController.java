@@ -88,6 +88,12 @@ public class BoardController {
         return taskService.filter(board, filterFields);
     }
 
+    /**
+     * end point that responsible for fetching all boards
+     * @param board
+     * @return
+     */
+
     @AccessLevel(UserRole.REGISTERED)
     @GetMapping(value = "/getAllTasks")
     public Set<Task> getAllTasks(@RequestAttribute("board") Board board) {
