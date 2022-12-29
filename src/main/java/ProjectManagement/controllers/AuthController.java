@@ -12,14 +12,29 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.regex.Pattern;
 
-
+/**
+ * Controller for handling authentication related requests.
+ */
 @RestController
 public class AuthController {
+    /**
+     * Service for handling authentication related tasks.
+     */
     @Autowired
     private AuthService authService;
+    /**
+     * Regular expression for extracting the token from a Bearer token.
+     */
     private final Pattern bearerPattern = Pattern.compile("^[Bb]earer\\s+(.*)$");
 
-    @PostMapping ("/login")
+    /**
+     * Logs in a user using their email and password.
+     *
+     * @param credentials the login credentials of the user
+     * @return an HTTP response with the login token if the login is successful,
+     * or an HTTP error response with an error message if the login fails
+     */
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginCredentials credentials) {
         if (Validation.isValidUserProperties(credentials.getEmail(), credentials.getPassword()).isSucceed()) {
             Response<String> login = authService.login(credentials.getEmail(), credentials.getPassword());
@@ -31,6 +46,13 @@ public class AuthController {
         } else return ResponseEntity.badRequest().body("bad input format.");
     }
 
+    /**
+     * Obtains a new login token using an existing one.
+     *
+     * @param bearerToken the existing login token in the form of a Bearer token
+     * @return an HTTP response with the new login token if the re-login is successful,
+     * or an HTTP error response with an error message if the re-login fails
+     */
     @GetMapping("/loginWithToken")
     public ResponseEntity<String> reLogin(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         var matcher = bearerPattern.matcher(bearerToken);
