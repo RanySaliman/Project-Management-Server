@@ -44,11 +44,10 @@ public class BoardController {
     private BoardRepository boardRepository;
     /**
      * end point that responsible for fetching board
-     *
      * @return board
      *
      */
-    @RequestMapping(value = "getBoard", method = RequestMethod.GET)
+    @RequestMapping(value = "getBoard/{boardId}", method = RequestMethod.GET)
     public ResponseEntity<Board> getBoard(@RequestHeader int id) {
         Response<Board> board = boardService.getBoard(id);
         if (board.isSucceed()) {
