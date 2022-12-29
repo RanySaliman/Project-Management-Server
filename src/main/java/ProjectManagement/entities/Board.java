@@ -26,6 +26,7 @@ public class Board {
     @ToString.Exclude
     @OneToMany(targetEntity=UserInBoard.class, cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name = "board_id")
+    @JsonManagedReference
     Set<UserInBoard> users;
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

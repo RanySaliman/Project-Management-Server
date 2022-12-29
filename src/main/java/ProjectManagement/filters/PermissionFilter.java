@@ -80,9 +80,9 @@ public class PermissionFilter implements Filter {
             } else {
                 System.out.println("PermissionFilter pass the request because no annotation is present");
                 filterChain.doFilter(servletRequest, servletResponse);
-
             }
         } catch (Exception e) {
+            System.out.println("PermissionFilter denied the request because of an exception\n" + e.getMessage());
             res.sendError(500, "Internal Server Error");
 
         }
