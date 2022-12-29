@@ -2,6 +2,8 @@ package ProjectManagement.entities;
 
 import ProjectManagement.entities.enums.NotificationMethod;
 import ProjectManagement.entities.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +20,7 @@ public class UserInBoard {
 
     @ManyToOne
     @JoinColumn(name = "board_id", insertable = false, updatable = false)
+    @JsonBackReference
     Board board;
 
     @ManyToOne

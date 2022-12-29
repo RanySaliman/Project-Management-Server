@@ -49,7 +49,7 @@ public class Task {
     private  String type;
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "Comments", joinColumns = @JoinColumn(name = "TaskId",referencedColumnName="id", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {"TaskId"}))
     @Column(name = "Comment")
     private Set<Comment> comments;
