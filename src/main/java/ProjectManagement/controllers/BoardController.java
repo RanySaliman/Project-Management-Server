@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -33,26 +34,22 @@ public class BoardController {
      * end point that responsible for fetching board
      * @return board
      */
-    @RequestMapping(value = "getBoard/{boardId}", method = RequestMethod.GET)
-    public ResponseEntity<Board> getBoard(@RequestHeader int id) {
-        Response<Board> board = boardService.getBoard(id);
-        if (board.isSucceed()) {
-            return ResponseEntity.ok(board.getData());
-        } else {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @AccessLevel(UserRole.REGISTERED)
+    @RequestMapping(value = "getBoard", method = RequestMethod.GET)
+    public ResponseEntity<Board> getBoard(@RequestAttribute("board")Board board) {
+            return ResponseEntity.ok(board);
     }
 
     @PostMapping(value = "createBoard")
-    public ResponseEntity<String> createBoard(@RequestAttribute("userId") int userId, @RequestParam("name") String boardName) {
+    public ResponseEntity<Object> createBoard(@RequestAttribute("userId") int userId, @RequestParam("name") String boardName) {
         Response<User> user = userService.getUserById(userId);
         if (user.isSucceed()) {
             Response<Board> optionalBoard = boardService.createBoard(user.getData(), boardName);
             if (optionalBoard.isSucceed()) {
                 notificationsService.notificationHappened(optionalBoard.getData(), Events.NewBoard);
-                return ResponseEntity.ok("Board created successfully");
+                return ResponseEntity.ok(optionalBoard.getData());
             } else {
-                return ResponseEntity.badRequest().body(optionalBoard.getMessage());
+                return ResponseEntity.badRequest().body("Cannot create a board because " + optionalBoard.getMessage());
             }
         } else {
             return ResponseEntity.badRequest().body("User not found");

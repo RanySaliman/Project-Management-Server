@@ -66,20 +66,25 @@ public class PermissionFilter implements Filter {
                     Optional<UserInBoard> ub = board.getUser(user.getId());
                     if (ub.isPresent()&& isAllowedAccess(hasAccessLevel.getData(), ub.get().getUserRole())) {
                         filterChain.doFilter(servletRequest, servletResponse);
+
                     } else {
                         System.out.println("PermissionFilter: User doesn't have permission to access this resource");
                         res.sendError(403, "You don't have permission to access this board");
+
                     }
                 } else {
                     System.out.println("PermissionFilter denied the request because user or board not found");
                     res.sendError(400, "User or board not found");
+
                 }
             } else {
                 System.out.println("PermissionFilter pass the request because no annotation is present");
                 filterChain.doFilter(servletRequest, servletResponse);
+
             }
         } catch (Exception e) {
             res.sendError(500, "Internal Server Error");
+
         }
     }
 
