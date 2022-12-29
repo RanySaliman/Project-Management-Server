@@ -1,3 +1,5 @@
+package Java;
+
 import ProjectManagement.SpringApp;
 import ProjectManagement.controllers.BoardController;
 import ProjectManagement.controllers.entities.TaskFields;

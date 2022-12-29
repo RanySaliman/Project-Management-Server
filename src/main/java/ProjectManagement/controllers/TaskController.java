@@ -32,7 +32,6 @@ public class TaskController {
 
     /**
      * end point that responsible for fetching task
-     *
      * @param fields - task fields
      * @return if succeed - task, else - error message
      */
