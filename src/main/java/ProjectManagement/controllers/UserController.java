@@ -1,6 +1,5 @@
 package ProjectManagement.controllers;
 
-import ProjectManagement.controllers.entities.LoginCredentials;
 import ProjectManagement.controllers.entities.UserToRegister;
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.User;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Optional;
-
 @Controller
 public class UserController {
     private final UserService userService;
@@ -27,6 +24,13 @@ public class UserController {
         this.authService = authService;
     }
 
+    /**
+     * Registers a user with GitHub and logs them in.
+     *
+     * @param code the authorization code received from GitHub after the user grants access
+     * @return an HTTP response with a string containing the login token if the request is successful,
+     * or an HTTP error response with a string containing an error message if the request fails
+     */
     @GetMapping("/registerWithGithub")
     public ResponseEntity<String> githubRegister(@RequestParam String code) {
         Response<User> userResponse = userService.registerWithGithub(code);
@@ -35,12 +39,19 @@ public class UserController {
             if (githubLogin.isSucceed()) {
                 return ResponseEntity.ok(githubLogin.getData());
             } else {
-                return ResponseEntity.badRequest().body("failed to login.\n"+githubLogin.getMessage());
+                return ResponseEntity.badRequest().body("failed to login.\n" + githubLogin.getMessage());
             }
         }
-        return ResponseEntity.badRequest().body("failed to register.\n"+userResponse.getMessage());
+        return ResponseEntity.badRequest().body("failed to register.\n" + userResponse.getMessage());
     }
 
+    /**
+     * Registers a user locally and logs them in.
+     *
+     * @param userToRegister the user information to use for registration
+     * @return an HTTP response with a string containing a success message if the request is successful,
+     * or an HTTP error response with a string containing an error message if the request fails
+     */
     @PostMapping("/register")
     public ResponseEntity<String> localRegister(@RequestBody UserToRegister userToRegister) {
         Response<Void> isValidUser = Validation.isValidUserProperties(userToRegister.getUsername(), userToRegister.getPassword(), userToRegister.getEmail());

@@ -1,16 +1,10 @@
 package ProjectManagement.controllers;
 
 import ProjectManagement.controllers.entities.TaskInput;
-import ProjectManagement.entities.Board;
-import ProjectManagement.entities.Comment;
-import ProjectManagement.entities.Response;
-import ProjectManagement.entities.Task;
-import ProjectManagement.entities.User;
+import ProjectManagement.entities.*;
 import ProjectManagement.entities.annotations.AccessLevel;
 import ProjectManagement.entities.enums.Events;
 import ProjectManagement.entities.enums.UserRole;
-import ProjectManagement.entities.enums.UserActions;
-import ProjectManagement.repositories.BoardRepository;
 import ProjectManagement.services.BoardService;
 import ProjectManagement.services.NotificationsService;
 import ProjectManagement.services.TaskService;
@@ -31,17 +25,17 @@ public class TaskController {
     private BoardService boardService;
     @Autowired
     private NotificationsService notificationsService;
-    @Autowired
-    private BoardRepository boardRepository;
 
 
     /**
-     * end point that responsible for adding a task
-     * <p>
-     * end point that responsible for fetching task
+     * Adds a task to a board.
+     * every user who is leader or admin of the board can add a task to the board.
      *
-     * @param fields - task fields
-     * @return if succeed - task added, else - error message
+     * @param user   the user who is adding the task
+     * @param board  the board to which the task will be added
+     * @param fields the input fields for the task
+     * @return an HTTP response with a response object containing the added task if the request is successful,
+     * or an HTTP error response with a response object containing an error message if the request fails
      */
     @AccessLevel(UserRole.LEADER)
     @PostMapping(value = "addTask")
@@ -61,6 +55,14 @@ public class TaskController {
         }
     }
 
+    /**
+     * Takes input from the user as taskInput and convert it to a new task object.
+     *
+     * @param userID    the ID of the user creating the task
+     * @param board     the board to which the task belongs
+     * @param taskInput the task input object to be converted
+     * @return a response object containing the task if the input is valid, or an error message if the input is invalid
+     */
     private Response<Task> fromTaskInput(int userID, Board board, TaskInput taskInput) {
         Optional<LocalDateTime> optionalDueDate = ControllerUtil.convertOffsetToLocalDateTime(taskInput.getDueDate());
         Response<Void> isValidSyntax = Validation.isValidTaskInput(taskInput);
@@ -84,6 +86,15 @@ public class TaskController {
         return Response.createSuccessfulResponse(task);
     }
 
+    /**
+     * Deletes a task from a board.
+     * just admin can delete a task.
+     *
+     * @param user   the user who is deleting the task
+     * @param taskId the ID of the task to be deleted
+     * @return an HTTP response with the deleted task if the request is successful,
+     * or an HTTP error response with a null body if the request fails
+     */
     @AccessLevel(UserRole.ADMIN)
     @DeleteMapping(value = "deleteTask/{taskId}")
     public ResponseEntity<Task> deleteTask(@RequestAttribute("user") User user, @PathVariable("taskId") int taskId) {
@@ -96,6 +107,16 @@ public class TaskController {
         return ResponseEntity.badRequest().body(null);
     }
 
+    /**
+     * Updates the status of a task.
+     * every user who is registered to the board can update the status of a task.
+     *
+     * @param board  the board to which the task belongs
+     * @param status the new status of the task
+     * @param taskId the ID of the task to be updated
+     * @return an HTTP response with no body if the request is successful,
+     * or an HTTP error response with a null body if the request fails
+     */
     @AccessLevel(UserRole.REGISTERED)
     @PutMapping("/statusUpdate/{task}/{status}")
     public ResponseEntity<Void> updateTaskStatus(@RequestAttribute("board") Board board, @PathVariable("status") String status, @PathVariable("task") int taskId) {
@@ -103,11 +124,22 @@ public class TaskController {
         Response<Task> task = taskService.getTask(taskId);
         if (task.isSucceed()) {
             // Update the board's status
-            boardService.updateBoardStatus(board,status);
-            taskService.updateTaskStatus(task.getData(),status);
+            boardService.updateBoardStatus(board, status);
+            taskService.updateTaskStatus(task.getData(), status);
             return ResponseEntity.noContent().build();
-        }else return ResponseEntity.badRequest().body(null);
+        } else return ResponseEntity.badRequest().body(null);
     }
+
+    /**
+     * Updates the type of  task.
+     * every user who is registered to the board can update the type of a task.
+     *
+     * @param board  the board to which the task belongs
+     * @param type   the new type of the task
+     * @param taskId the ID of the task to be updated
+     * @return an HTTP response with no content if the request is successful,
+     * or an HTTP error response with a null body if the request fails
+     */
     @AccessLevel(UserRole.REGISTERED)
     @PutMapping("/typeUpdate/{task}/{type}")
     public ResponseEntity<Void> updateTaskType(@RequestAttribute("board") Board board, @PathVariable("type") String type, @PathVariable("task") int taskId) {
@@ -115,19 +147,30 @@ public class TaskController {
         Response<Task> task = taskService.getTask(taskId);
         if (task.isSucceed()) {
             // Update the board's status
-            boardService.updateBoardType(board,type);
-            taskService.updateTaskType(task.getData(),type);
+            boardService.updateBoardType(board, type);
+            taskService.updateTaskType(task.getData(), type);
             return ResponseEntity.noContent().build();
-        }else return ResponseEntity.badRequest().body(null);
+        } else return ResponseEntity.badRequest().body(null);
     }
 
+    /**
+     * Adds a comment to a task.
+     * only users who are registered to board can add a comment to a task.
+     *
+     * @param user    the user who is adding the comment
+     * @param content the content of the comment
+     * @param taskId  the ID of the task to which the comment will be added
+     * @return an HTTP response with a response object containing the updated task if the request is successful,
+     * or an HTTP error response with a response object containing an error message if the request fails
+     */
+    @AccessLevel(UserRole.REGISTERED)
     @PostMapping(value = "addComment/{taskId}")
     public ResponseEntity<Response<Task>> addComment(@RequestAttribute("user") User user, @RequestBody String content, @PathVariable int taskId) {
-        Comment comment = new Comment(content,user);
+        Comment comment = new Comment(content, user);
         Response<Task> task = taskService.getTask(taskId);
-        if(task.isSucceed()){
+        if (task.isSucceed()) {
             taskService.addComment(task.getData(), comment);
             return ResponseEntity.ok(Response.createSuccessfulResponse(taskService.addComment(task.getData(), comment)));
-        }else return ResponseEntity.badRequest().body(Response.createFailureResponse("task not found"));
+        } else return ResponseEntity.badRequest().body(Response.createFailureResponse("task not found"));
     }
 }
