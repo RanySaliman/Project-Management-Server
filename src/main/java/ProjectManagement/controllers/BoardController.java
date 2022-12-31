@@ -120,7 +120,7 @@ public class BoardController {
      * @return a set of tasks that match the given criteria
      */
     @AccessLevel(UserRole.REGISTERED)
-    @GetMapping(value = "/filter")
+    @PostMapping(value = "/filter")
     public Set<Task> filter(@RequestAttribute("board") Board board, @RequestBody TaskFields filterFields) {
         return taskService.filter(board, filterFields);
     }
