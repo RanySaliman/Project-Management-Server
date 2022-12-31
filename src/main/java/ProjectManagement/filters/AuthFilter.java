@@ -16,6 +16,7 @@ public class AuthFilter implements Filter {
     private final AuthService authService;
     private final Pattern bearerPattern = Pattern.compile("^[Bb]earer\\s+(.*)$");
     private final Set<Pattern> publicUrls = Set.of(Pattern.compile("^/board/.*$"), Pattern.compile("^/task/.*$"));
+
     public AuthFilter(AuthService authService) {
         this.authService = authService;
     }
@@ -25,6 +26,15 @@ public class AuthFilter implements Filter {
         Filter.super.init(filterConfig);
     }
 
+    /**
+     * Filters incoming HTTP requests to check for valid authorization.
+     *
+     * @param servletRequest  the incoming HTTP request
+     * @param servletResponse the HTTP response to be sent
+     * @param filterChain     the filter chain
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;

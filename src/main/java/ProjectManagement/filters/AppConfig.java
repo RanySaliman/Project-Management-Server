@@ -1,8 +1,6 @@
 package ProjectManagement.filters;
 
 import ProjectManagement.services.AuthService;
-import ProjectManagement.services.BoardService;
-import ProjectManagement.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
