@@ -1,6 +1,7 @@
 package ProjectManagement.controllers;
 
 
+import ProjectManagement.controllers.entities.BoardToPresent;
 import ProjectManagement.controllers.entities.TaskFields;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Response;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -45,8 +48,8 @@ public class BoardController {
      */
     @AccessLevel(UserRole.REGISTERED)
     @RequestMapping(value = "getBoard", method = RequestMethod.GET)
-    public ResponseEntity<Board> getBoard(@RequestAttribute("board") Board board) {
-        return ResponseEntity.ok(board);
+    public ResponseEntity<BoardToPresent> getBoard(@RequestAttribute("board") Board board) {
+        return ResponseEntity.ok(BoardToPresent.fromBoard(board));
     }
 
     /**
@@ -91,9 +94,9 @@ public class BoardController {
 
     /**
      * Adds a user to a board.
+     * if the user is already in the board, updates the user's role to the new role.
      * only the admin of the board can add a user to the board.
      *
-     * @param user          the user who is making the request
      * @param board         the board to which the user will be added
      * @param userRole      the role of the user being added to the board
      * @param userNameToAdd the name of the user to be added to the board
@@ -101,12 +104,12 @@ public class BoardController {
      * or an HTTP error response with an error message if the request fails
      */
     @AccessLevel(UserRole.ADMIN)
-    @PostMapping(value = "addUserToBoard/{boardId}")
-    public ResponseEntity<String> addUserToBoard(@RequestAttribute("user") User user, @RequestAttribute("board") Board board, @RequestParam("userRole") String userRole, @RequestParam("adduser") String userNameToAdd) {
+    @PostMapping(value = "addUserToBoard")
+    public ResponseEntity<String> addUserToBoard(@RequestAttribute("board") Board board, @RequestParam("userRole") String userRole, @RequestParam("adduser") String userNameToAdd) {
         Response<User> optionalUser = userService.getUserByName(userNameToAdd);
         if (optionalUser.isSucceed()) {
             boardService.addUserToBoard(optionalUser.getData(), board, UserRole.valueOf(userRole));
-            return ResponseEntity.ok("User added successfully");
+            return ResponseEntity.ok("action succeeded");
         }
         return ResponseEntity.badRequest().body("could not add user to board");
     }
@@ -138,4 +141,15 @@ public class BoardController {
         return boardService.getAllTasks(board);
     }
 
+    /**
+     * This method returns a list of all boards that the specified user is a member of.
+     * The boards are presented in the form of {@link BoardToPresent} objects.
+     *
+     * @param userId the ID of the user whose boards to get
+     * @return a list of {@link BoardToPresent} objects representing the user's boards
+     */
+    @GetMapping(value = "/getAllBoards")
+    public List<BoardToPresent> getAllBoards(@RequestAttribute("userId") int userId) {
+        return boardService.getAllBoards(userId).stream().map(BoardToPresent::fromBoard).collect(Collectors.toList());
+    }
 }
