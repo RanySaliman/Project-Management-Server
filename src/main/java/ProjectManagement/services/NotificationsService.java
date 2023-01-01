@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class NotificationsService {
@@ -23,21 +22,23 @@ public class NotificationsService {
     private EmailSender emailSender;
     @Autowired
     private SocketsUtil socketsUtil;
+
     public void notificationHappened(Object o, Events event) {
-        emailSender.sendEmail(userRepo.findAll().stream().map(User::getEmail).collect(Collectors.toList()), "Notification", event.name()+"\n"+o.toString());
+        emailSender.sendEmail(userRepo.findAll().stream().map(User::getEmail).collect(Collectors.toList()), "Notification", event.name() + "\n" + o.toString());
     }
 
     public void notificationHappenedOnBoard(Object o, Board board, Events event) {
         List<String> emailRecipients = board.getUsers().stream().
                 filter(userInBoard -> userInBoard.getNotificationMethods().contains(NotificationMethod.EMAIL)).
                 map(UserInBoard::getUser).map(User::getEmail).collect(Collectors.toList());
-        if(emailRecipients.size()>0 ) {
+        if (emailRecipients.size() > 0) {
             emailSender.sendEmail(emailRecipients, "Notification", event.name() + "\n" + o.toString());
         }
     }
-    public void notifyAllUsers(List<User> user, Events event, Object o){
+
+    public void notifyAllUsers(List<User> user, Events event, Object o) {
         List<String> emailRecipients = user.stream().map(User::getEmail).collect(Collectors.toList());
-        if(emailRecipients.size()>0 ) {
+        if (emailRecipients.size() > 0) {
             emailSender.sendEmail(emailRecipients, "Notification", event.name() + "\n" + o.toString());
         }
     }
@@ -46,8 +47,8 @@ public class NotificationsService {
         List<Integer> popUpRecipients = board.getUsers().stream().
                 filter(userInBoard -> userInBoard.getNotificationMethods().contains(NotificationMethod.POPUP)).
                 map(UserInBoard::getUser).map(User::getId).collect(Collectors.toList());
-        if(popUpRecipients.size()>0 ) {
-            for (Integer id:popUpRecipients) {
+        if (popUpRecipients.size() > 0) {
+            for (Integer id : popUpRecipients) {
                 socketsUtil.popupNotification(id, event.name());
             }
         }

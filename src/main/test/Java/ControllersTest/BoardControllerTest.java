@@ -1,4 +1,4 @@
-package Java;
+package Java.ControllersTest;
 
 import ProjectManagement.SpringApp;
 import ProjectManagement.controllers.BoardController;
@@ -67,6 +67,5 @@ public class BoardControllerTest {
     @Test
     public void filter_Successfully(){
         boardController.filter(board, taskFields);
-
     }
 }

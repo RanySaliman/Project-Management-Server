@@ -15,12 +15,17 @@ public class ControllerUtil {
      * @return
      */
     public static Optional<LocalDateTime> convertOffsetToLocalDateTime(String offsetDateTimeString) {
-        if (offsetDateTimeString == null || offsetDateTimeString.isEmpty()) {
+        try {
+            if (offsetDateTimeString == null || offsetDateTimeString.isEmpty()) {
+                return Optional.empty();
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(offsetDateTimeString, formatter);
+            ZonedDateTime zoned = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
+            return Optional.of(zoned.toLocalDateTime());
+        }
+        catch (Exception e) {
             return Optional.empty();
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(offsetDateTimeString, formatter);
-        ZonedDateTime zoned = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
-        return Optional.of(zoned.toLocalDateTime());
     }
 }

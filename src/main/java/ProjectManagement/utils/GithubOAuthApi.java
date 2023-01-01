@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @Component
 public class GithubOAuthApi {
     @Value("${github.clientId}")
@@ -26,6 +27,13 @@ public class GithubOAuthApi {
         this.restTemplate = builder.build();
     }
 
+    /**
+     * Retrieves user information from GitHub using the provided access token.
+     *
+     * @param httpEntityWithToken HTTP entity containing the access token in the headers
+     * @return a response object containing the user information, or a failure response if an error occurred
+     */
+
     public Response<GithubUser> getUserInfoFromGithub(HttpEntity<Void> httpEntityWithToken) {
         GithubUser githubUser;
         try {
@@ -38,6 +46,12 @@ public class GithubOAuthApi {
         return Response.createSuccessfulResponse(githubUser);
     }
 
+    /**
+     * Retrieves the primary email address of the user from GitHub using the provided access token.
+     *
+     * @param entityWithAccessToken HTTP entity containing the access token in the headers
+     * @return a response object containing the user's primary email address, or a failure response if an error occurred
+     */
     public Response<String> getUserEmailFromGithub(HttpEntity<Void> entityWithAccessToken) {
         try {
             ResponseEntity<GithubEmail[]> githubEmails = restTemplate.exchange("https://api.github.com/user/emails", HttpMethod.GET, entityWithAccessToken, GithubEmail[].class);
@@ -54,6 +68,12 @@ public class GithubOAuthApi {
         }
     }
 
+    /**
+     * Retrieves an access token from GitHub using the provided authorization code.
+     *
+     * @param code the authorization code
+     * @return a response object containing the access token, or a failure response if an error occurred
+     */
     public Response<String> getAccessTokenFromGithub(String code) {
         String url = "https://github.com/login/oauth/access_token?" +
                 "client_id=" + clientId + "&client_secret=" + clientSecret +
@@ -76,6 +96,12 @@ public class GithubOAuthApi {
         }
     }
 
+    /**
+     * Converts the given URL parameters string into a map.
+     *
+     * @param url the URL parameters string
+     * @return a map containing the key-value pairs from the URL parameters string
+     */
     private Map<String, String> fromURLParamsToMap(String url) {
         String[] params = url.split("&");
         Map<String, String> map = new HashMap<>();
