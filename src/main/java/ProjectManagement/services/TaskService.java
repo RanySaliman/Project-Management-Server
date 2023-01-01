@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TaskService {
@@ -36,35 +37,44 @@ public class TaskService {
         Integer importance =filterFields.getImportance();
         String description= filterFields.getDescription();
         Integer taskParentId= filterFields.getTaskParentId();
-        Set<Task> filteredTak = board.getTasks();
-        System.out.println((filteredTak.size()));
+        String status = filterFields.getStatus();
+        String type = filterFields.getType();
+        Stream<Task> filteredTask = board.getTasks().stream();
         if(creator > 0){
-            filteredTak =filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toSet());
+            filteredTask =filteredTask.filter(task -> task.getCreator() == creator);
 
         }
         if (description != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getDescription(), description)).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> Objects.equals(task.getDescription(), description));
         }
         if (title != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getTitle(), title)).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> Objects.equals(task.getTitle(), title));
         }
 
         if (dueDate != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getDueDate() == dueDate);
         }
         if (importance > 0) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getImportance() == importance).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getImportance() == importance);
         }
 
         if (taskParentId > 0) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getTaskParentId() == taskParentId).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getTaskParentId() == taskParentId);
         }
-        return filteredTak;
+
+        if(status != null){
+            filteredTask= filteredTask.filter(task -> Objects.equals(task.getStatus(), status));
+        }
+
+        if( type!= null){
+            filteredTask= filteredTask.filter(task -> Objects.equals(task.getType(), type));
+        }
+        return filteredTask.collect(Collectors.toSet());
     }
 
     public Response<Task> addTask(Task task) {
@@ -81,8 +91,12 @@ public class TaskService {
         }
     }
 
-    public Response<Void> deleteTask(int taskId) {
-        taskRepository.deleteById(taskId);
+    public Response<Void> deleteTask(Task task) {
+        Board board = task.getBoard();
+        board.getTasks().remove(task);
+        taskRepository.delete(task);
+        Optional<Task> result2 = taskRepository.findById(task.getId());
+        System.out.println(result2.isPresent());
         return Response.createSuccessfulResponse(null);
     }
 
