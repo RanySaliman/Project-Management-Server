@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class TaskFields {
-    int boardId;
-    private int id;
     private int taskParentId;
     private int creator;
     private int assignedUserId;
@@ -21,6 +19,9 @@ public class TaskFields {
     private int importance;
     private String description;
     String title;
+    String status;
+    String type;
+
 
 
 }

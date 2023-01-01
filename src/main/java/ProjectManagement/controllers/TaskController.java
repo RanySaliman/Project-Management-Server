@@ -100,7 +100,8 @@ public class TaskController {
     public ResponseEntity<Task> deleteTask(@RequestAttribute("user") User user, @PathVariable("taskId") int taskId) {
         Response<Task> task = taskService.getTask(taskId);
         if (task.isSucceed()) {
-            taskService.deleteTask(taskId);
+            System.out.println("get task id and is succeed for deleted" +taskId);
+            taskService.deleteTask(task.getData());
             notificationsService.notificationHappened(task.getData(), Events.DeleteTask);
             return ResponseEntity.ok(task.getData());
         }

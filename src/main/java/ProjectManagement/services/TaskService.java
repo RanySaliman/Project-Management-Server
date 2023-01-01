@@ -1,6 +1,4 @@
 package ProjectManagement.services;
-
-
 import ProjectManagement.controllers.entities.TaskFields;
 import ProjectManagement.entities.Board;
 import ProjectManagement.entities.Comment;
@@ -9,12 +7,12 @@ import ProjectManagement.entities.Task;
 import ProjectManagement.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TaskService {
@@ -35,38 +33,48 @@ public class TaskService {
         Integer creator = filterFields.getCreator();
         String title = filterFields.getTitle();
         LocalDateTime dueDate = filterFields.getDueDate();
-        Integer importance = filterFields.getImportance();
-        String description = filterFields.getDescription();
-        Integer taskParentId = filterFields.getTaskParentId();
-        Set<Task> filteredTak = board.getTasks();
-        System.out.println((filteredTak.size()));
-        if (creator > 0) {
-            filteredTak = filteredTak.stream().filter(task -> task.getCreator() == creator).collect(Collectors.toSet());
+        Integer importance =filterFields.getImportance();
+        String description= filterFields.getDescription();
+        Integer taskParentId= filterFields.getTaskParentId();
+        String status = filterFields.getStatus();
+        String type = filterFields.getType();
+        Stream<Task> filteredTask = board.getTasks().stream();
+        if(creator > 0){
+            filteredTask =filteredTask.filter(task -> task.getCreator() == creator);
+
 
         }
         if (description != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getDescription(), description)).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> Objects.equals(task.getDescription(), description));
         }
         if (title != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> Objects.equals(task.getTitle(), title)).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> Objects.equals(task.getTitle(), title));
         }
 
         if (dueDate != null) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getDueDate() == dueDate).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getDueDate() == dueDate);
         }
         if (importance > 0) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getImportance() == importance).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getImportance() == importance);
         }
 
         if (taskParentId > 0) {
-            filteredTak = filteredTak.stream()
-                    .filter(task -> task.getTaskParentId() == taskParentId).collect(Collectors.toSet());
+            filteredTask = filteredTask
+                    .filter(task -> task.getTaskParentId() == taskParentId);
         }
-        return filteredTak;
+
+        if(status != null){
+            filteredTask= filteredTask.filter(task -> Objects.equals(task.getStatus(), status));
+        }
+
+        if( type!= null){
+            filteredTask= filteredTask.filter(task -> Objects.equals(task.getType(), type));
+        }
+        return filteredTask.collect(Collectors.toSet());
     }
 
     /**
@@ -95,14 +103,13 @@ public class TaskService {
         }
     }
 
-    /**
-     * Deletes the task with the given ID from the repository.
-     *
-     * @param taskId the ID of the task to delete
-     * @return a response object with a success message if the task was deleted successfully, or an error message otherwise
-     */
-    public Response<Void> deleteTask(int taskId) {
-        taskRepository.deleteById(taskId);
+    public Response<Void> deleteTask(Task task) {
+        Board board = task.getBoard();
+        board.getTasks().remove(task);
+        taskRepository.delete(task);
+        Optional<Task> result2 = taskRepository.findById(task.getId());
+        System.out.println(result2.isPresent());
+
         return Response.createSuccessfulResponse(null);
     }
 

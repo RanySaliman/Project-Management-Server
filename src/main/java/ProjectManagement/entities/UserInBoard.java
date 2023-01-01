@@ -26,7 +26,6 @@ public class UserInBoard {
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     User user;
-
     @Enumerated(EnumType.STRING)
     UserRole userRole;
 
