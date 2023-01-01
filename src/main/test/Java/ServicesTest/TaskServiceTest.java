@@ -1,4 +1,4 @@
-package Java;
+package Java.ServicesTest;
 
 import ProjectManagement.entities.Response;
 import ProjectManagement.entities.Task;

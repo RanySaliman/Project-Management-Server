@@ -55,6 +55,7 @@ public class AuthController {
      */
     @GetMapping("/loginWithToken")
     public ResponseEntity<String> reLogin(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        if(bearerToken== null|| bearerToken.isEmpty()) return ResponseEntity.badRequest().body("no token provided.");
         var matcher = bearerPattern.matcher(bearerToken);
         if (matcher.matches()) {
             String token = matcher.group(1);
