@@ -1,4 +1,4 @@
-package Java;
+package Java.Controllers;
 
 import ProjectManagement.SpringApp;
 import ProjectManagement.controllers.BoardController;
