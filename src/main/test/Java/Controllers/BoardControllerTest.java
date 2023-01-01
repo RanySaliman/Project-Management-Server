@@ -1,5 +1,4 @@
-
-package Java.ControllersTest;
+package Java.Controllers;
 
 import ProjectManagement.SpringApp;
 import ProjectManagement.controllers.BoardController;
